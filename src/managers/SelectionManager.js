@@ -186,6 +186,7 @@ export class SelectionManager {
         if (this.selectedNodes.has(node)) {
             this.selectedNodes.delete(node);
             node.deselect();
+            this.graph.emit('node:deselect', node);
             this.graph.emit('selection:change', { nodes: Array.from(this.selectedNodes) });
         }
     }
@@ -229,7 +230,10 @@ export class SelectionManager {
      * Clear all selection
      */
     clearSelection() {
-        this.selectedNodes.forEach(node => node.deselect());
+        this.selectedNodes.forEach(node => {
+            node.deselect();
+            this.graph.emit('node:deselect', node);
+        });
         this.selectedNodes.clear();
         this.clearConnectionSelection();
         this.graph.emit('selection:change', { nodes: [], connections: [] });

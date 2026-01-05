@@ -1058,7 +1058,7 @@ class D {
    * @param {Node} node - Node to remove
    */
   removeFromSelection(t) {
-    this.selectedNodes.has(t) && (this.selectedNodes.delete(t), t.deselect(), this.graph.emit("selection:change", { nodes: Array.from(this.selectedNodes) }));
+    this.selectedNodes.has(t) && (this.selectedNodes.delete(t), t.deselect(), this.graph.emit("node:deselect", t), this.graph.emit("selection:change", { nodes: Array.from(this.selectedNodes) }));
   }
   /**
    * Toggle node selection
@@ -1085,7 +1085,9 @@ class D {
    * Clear all selection
    */
   clearSelection() {
-    this.selectedNodes.forEach((t) => t.deselect()), this.selectedNodes.clear(), this.clearConnectionSelection(), this.graph.emit("selection:change", { nodes: [], connections: [] });
+    this.selectedNodes.forEach((t) => {
+      t.deselect(), this.graph.emit("node:deselect", t);
+    }), this.selectedNodes.clear(), this.clearConnectionSelection(), this.graph.emit("selection:change", { nodes: [], connections: [] });
   }
   /**
    * Select all nodes
