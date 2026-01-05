@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Edge Node: Slots on the border
     const node7 = graph.addNode({
-        id: 'node-edge',
+        id: 'node-edge-2',
         position: { x: 100, y: 350 },
         header: { content: '<strong>Edge Node</strong>', style: { background: 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)' } },
         body: { content: '<p>Connectors on the edge, no label</p>' },

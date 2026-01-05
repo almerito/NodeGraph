@@ -268,8 +268,25 @@ export class NodeGraph extends EventEmitter {
         let targetSlot = null;
 
         if (slotElement) {
-            const slotId = slotElement.dataset.slotId;
-            targetSlot = this._findSlotById(slotId);
+            // Find parent node first to avoid global ID collisions
+            const nodeElement = slotElement.closest('.ng-node');
+            if (nodeElement) {
+                const nodeId = nodeElement.dataset.nodeId;
+                const node = this.nodes.get(nodeId);
+                if (node) {
+                    const slotId = slotElement.dataset.slotId;
+                    const slotType = slotElement.dataset.slotType;
+
+                    if (slotType === 'input') {
+                        targetSlot = node.inputSlots.get(slotId);
+                    } else if (slotType === 'output') {
+                        targetSlot = node.outputSlots.get(slotId);
+                    } else {
+                        // Fallback check both
+                        targetSlot = node.inputSlots.get(slotId) || node.outputSlots.get(slotId);
+                    }
+                }
+            }
         }
 
         // Handle enter/leave slot
