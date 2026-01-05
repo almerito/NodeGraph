@@ -169,9 +169,37 @@ document.addEventListener('DOMContentLoaded', () => {
         outputs: []
     });
 
+    // Resizable Node
+    const node10 = graph.addNode({
+        id: 'node-resize',
+        position: { x: 950, y: 50 },
+        resizable: true,
+        header: { content: '<strong>Resizable</strong>' },
+        body: { content: '<p>Drag bottom-right corner to resize</p>', style: { padding: '20px' } },
+        inputs: [
+            { id: 'resize_in', label: 'In' }
+        ],
+        outputs: [
+            { id: 'resize_out', label: 'Out' }
+        ]
+    });
+
     // Event listeners for demo
     graph.on('node:select', (node) => {
         console.log('Node selected:', node.id);
+    });
+
+    // Validation Example: Strict Shape Matching
+    graph.on('connection:validate', (context) => {
+        const { source, target } = context;
+        // Example: Only allow connecting slots of the same shape
+        // Default shape is 'circle' if undefined
+        const sourceShape = source.shape || 'circle';
+        const targetShape = target.shape || 'circle';
+
+        if (sourceShape !== targetShape) {
+            context.valid = false;
+        }
     });
 
     graph.on('connection:create', (conn) => {

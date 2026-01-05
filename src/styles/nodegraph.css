@@ -97,7 +97,24 @@
   border-radius: 7px 7px 0 0;
   color: white;
   font-weight: 600;
+  font-weight: 600;
   font-size: 13px;
+}
+
+.ng-node-resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  cursor: se-resize;
+  background: linear-gradient(135deg, transparent 50%, rgba(255, 255, 255, 0.1) 50%);
+  border-radius: 0 0 6px 0;
+  z-index: 20;
+}
+
+.ng-node-resize-handle:hover {
+  background: linear-gradient(135deg, transparent 50%, rgba(255, 255, 255, 0.3) 50%);
 }
 
 /* ============================================
@@ -348,6 +365,14 @@
 .ng-slot-connector--highlight {
   transform: scale(1.3);
   box-shadow: 0 0 8px currentColor;
+}
+
+.ng-slot-connector--invalid {
+  transform: scale(1.3);
+  border-color: #ff4444 !important;
+  box-shadow: 0 0 8px #ff4444;
+  background-color: #4a1111 !important;
+  cursor: not-allowed !important;
 }
 
 .ng-slot-click-area {

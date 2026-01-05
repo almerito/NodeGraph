@@ -24,6 +24,7 @@ export class Node {
         this.position = { x: config.position?.x || 0, y: config.position?.y || 0 };
         this.draggable = config.draggable !== false;
         this.selected = false;
+        this.resizable = config.resizable || false;
 
         this.inputSlots = new Map();
         this.outputSlots = new Map();
@@ -138,6 +139,13 @@ export class Node {
             Object.assign(this.slotsBottom.style, config.slotsBottom.style);
         }
         wrapper.appendChild(this.slotsBottom);
+
+        // Resize handle
+        if (this.resizable) {
+            this.resizeHandle = document.createElement('div');
+            this.resizeHandle.className = 'ng-node-resize-handle';
+            this.element.appendChild(this.resizeHandle);
+        }
     }
 
     /**
@@ -287,6 +295,56 @@ export class Node {
         };
 
         this.element.addEventListener('mousedown', onMouseDown);
+
+        // Resize handle logic
+        if (this.resizable && this.resizeHandle) {
+            let isResizing = false;
+            let startSize = { width: 0, height: 0 };
+            let resizeStartPos = { x: 0, y: 0 };
+
+            this.resizeHandle.addEventListener('mousedown', (e) => {
+                e.stopPropagation(); // Prevent node drag
+                if (e.button !== 0) return;
+
+                isResizing = true;
+                resizeStartPos = { x: e.clientX, y: e.clientY };
+                const rect = this.element.getBoundingClientRect();
+                // Store current style size or computed size
+                startSize = { width: rect.width, height: rect.height };
+
+                // Force current dimensions to style to prevent snap-back if it was auto
+                this.element.style.width = `${rect.width}px`;
+                this.element.style.height = `${rect.height}px`;
+
+                this.element.classList.add('ng-node--resizing');
+
+                document.addEventListener('mousemove', onResizeMove);
+                document.addEventListener('mouseup', onResizeUp);
+            });
+
+            const onResizeMove = (e) => {
+                if (!isResizing) return;
+
+                const scale = this.graph?.viewport?.scale || 1;
+                const dx = (e.clientX - resizeStartPos.x) / scale;
+                const dy = (e.clientY - resizeStartPos.y) / scale;
+
+                const newWidth = Math.max(100, startSize.width + dx); // Min width 100
+                const newHeight = Math.max(50, startSize.height + dy); // Min height 50
+
+                this.element.style.width = `${newWidth}px`;
+                this.element.style.height = `${newHeight}px`;
+
+                this._updateConnections();
+            };
+
+            const onResizeUp = () => {
+                isResizing = false;
+                this.element.classList.remove('ng-node--resizing');
+                document.removeEventListener('mousemove', onResizeMove);
+                document.removeEventListener('mouseup', onResizeUp);
+            };
+        }
 
         // Context menu
         this.element.addEventListener('contextmenu', (e) => {
@@ -514,6 +572,45 @@ export class Node {
     }
 
     /**
+     * Helper to extract style/class config from element
+     */
+    _extractConfig(element) {
+        if (!element) return null;
+        const config = {};
+        if (element.innerHTML) config.content = element.innerHTML;
+        if (element.className) {
+            // Filter out default classes
+            const classes = Array.from(element.classList)
+                .filter(c => !c.startsWith('ng-node-'));
+            if (classes.length > 0) config.className = classes.join(' ');
+        }
+        if (element.style && element.style.length > 0) {
+            config.style = {};
+            for (let i = 0; i < element.style.length; i++) {
+                const prop = element.style[i];
+                config.style[prop] = element.style.getPropertyValue(prop);
+            }
+        }
+        return Object.keys(config).length > 0 ? config : null;
+    }
+
+    /**
+     * Helper to extract style from container
+     */
+    _extractContainerConfig(element) {
+        if (!element) return null;
+        const config = {};
+        if (element.style && element.style.length > 0) {
+            config.style = {};
+            for (let i = 0; i < element.style.length; i++) {
+                const prop = element.style[i];
+                config.style[prop] = element.style.getPropertyValue(prop);
+            }
+        }
+        return Object.keys(config).length > 0 ? config : null;
+    }
+
+    /**
      * Serialize node data
      * @returns {object} Serialized data
      */
@@ -521,9 +618,16 @@ export class Node {
         return {
             id: this.id,
             position: { ...this.position },
-            header: this.headerElement ? { content: this.headerElement.innerHTML } : null,
-            body: this.bodyElement ? { content: this.bodyElement.innerHTML } : null,
-            footer: this.footerElement ? { content: this.footerElement.innerHTML } : null,
+
+            header: this._extractConfig(this.headerElement),
+            body: this._extractConfig(this.bodyElement),
+            footer: this._extractConfig(this.footerElement),
+
+            slotsTop: this._extractContainerConfig(this.slotsTop),
+            slotsBottom: this._extractContainerConfig(this.slotsBottom),
+            slotsLeft: this._extractContainerConfig(this.slotsLeft),
+            slotsRight: this._extractContainerConfig(this.slotsRight),
+
             inputs: Array.from(this.inputSlots.values()).map(s => s.serialize()),
             outputs: Array.from(this.outputSlots.values()).map(s => s.serialize())
         };

@@ -23,6 +23,7 @@ Create nodes using `graph.addNode(config)`.
 const node = graph.addNode({
     id: 'my-node',          // Unique string ID
     position: { x: 100, y: 100 },
+    resizable: true,        // Enable resizing handles (bottom-right)
     header: { content: '<strong>Title</strong>', className: 'my-header', style: { color: 'blue' } },
     body:   { content: '<p>Content</p>', className: 'my-body' },
     footer: { content: 'Status: OK', className: 'my-footer' }

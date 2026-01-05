@@ -254,6 +254,69 @@ export class NodeGraph extends EventEmitter {
         }
 
         this._tempPath.setAttribute('d', path);
+
+        // Validation Logic
+        const targetElement = document.elementFromPoint(event.clientX, event.clientY);
+        const slotClickArea = targetElement?.closest('.ng-slot-click-area');
+        const slotElement = slotClickArea?.closest('.ng-slot');
+        let targetSlot = null;
+
+        if (slotElement) {
+            const slotId = slotElement.dataset.slotId;
+            targetSlot = this._findSlotById(slotId);
+        }
+
+        // Handle enter/leave slot
+        const currentTarget = this._connectionDrag.targetSlot;
+
+        if (targetSlot !== currentTarget) {
+            // Leave previous
+            if (currentTarget) {
+                const conn = currentTarget.element.querySelector('.ng-slot-connector');
+                if (conn) conn.classList.remove('ng-slot-connector--invalid', 'ng-slot-connector--highlight');
+            }
+
+            // Enter new
+            if (targetSlot) {
+                // Special case: Hovering source slot (start point)
+                // Just highlight normally, no validation needed (it's always "neutral")
+                if (targetSlot === this._connectionDrag.sourceSlot) {
+                    const conn = targetSlot.element.querySelector('.ng-slot-connector');
+                    if (conn) conn.classList.add('ng-slot-connector--highlight');
+                    // We don't change isValid/context for source slot itself
+                } else {
+                    const context = {
+                        source: this._connectionDrag.sourceSlot,
+                        target: targetSlot,
+                        valid: true // Assume valid initially
+                    };
+
+                    // Default Rule 1: Same Node (but not the source slot itself, checked above)
+                    if (targetSlot.node === this._connectionDrag.sourceSlot.node) {
+                        context.valid = false;
+                    }
+                    // Default Rule 2: Type mismatch
+                    else if (targetSlot.type === this._connectionDrag.sourceSlot.type) {
+                        context.valid = false;
+                    }
+
+                    // Emit event to allow user modification
+                    this.emit('connection:validate', context);
+
+                    this._connectionDrag.isValid = context.valid;
+                    const conn = targetSlot.element.querySelector('.ng-slot-connector');
+                    if (conn) {
+                        if (!context.valid) {
+                            conn.classList.add('ng-slot-connector--invalid');
+                        } else {
+                            conn.classList.add('ng-slot-connector--highlight');
+                        }
+                    }
+                }
+            }
+
+            this._connectionDrag.targetSlot = targetSlot;
+        }
     }
 
     /**
@@ -262,26 +325,24 @@ export class NodeGraph extends EventEmitter {
     _endConnectionDrag(event) {
         if (!this._connectionDrag) return;
 
-        // Find target slot under cursor
-        const targetElement = document.elementFromPoint(event.clientX, event.clientY);
-        const slotClickArea = targetElement?.closest('.ng-slot-click-area');
-        const slotElement = slotClickArea?.closest('.ng-slot');
+        // Clean up visual feedback on target slot if exists
+        const targetSlot = this._connectionDrag.targetSlot;
+        if (targetSlot) {
+            const conn = targetSlot.element.querySelector('.ng-slot-connector');
+            if (conn) conn.classList.remove('ng-slot-connector--invalid', 'ng-slot-connector--highlight');
+        }
 
-        if (slotElement) {
-            const slotId = slotElement.dataset.slotId;
-            const slotType = slotElement.dataset.slotType;
-            const targetSlot = this._findSlotById(slotId);
+        if (targetSlot && this._connectionDrag.isValid) {
+            // Create connection
+            const sourceSlot = this._connectionDrag.sourceSlot;
 
-            if (targetSlot && targetSlot !== this._connectionDrag.sourceSlot) {
-                // Create connection
-                const sourceSlot = this._connectionDrag.sourceSlot;
+            // Check if already connected logic is inside connect() but we can check here too or rely on connect()
 
-                // Determine direction (output -> input)
-                if (sourceSlot.type === 'output' && targetSlot.type === 'input') {
-                    this.connect(sourceSlot, targetSlot);
-                } else if (sourceSlot.type === 'input' && targetSlot.type === 'output') {
-                    this.connect(targetSlot, sourceSlot);
-                }
+            // Determine direction (output -> input)
+            if (sourceSlot.type === 'output' && targetSlot.type === 'input') {
+                this.connect(sourceSlot, targetSlot);
+            } else if (sourceSlot.type === 'input' && targetSlot.type === 'output') {
+                this.connect(targetSlot, sourceSlot);
             }
         }
 
