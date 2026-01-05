@@ -57,7 +57,7 @@ function B(m, t) {
     clearTimeout(e), e = setTimeout(() => m.apply(this, s), t);
   };
 }
-function x(m = "") {
+function _(m = "") {
   const t = Date.now().toString(36), e = Math.random().toString(36).substring(2, 9);
   return m ? `${m}-${t}-${e}` : `${t}-${e}`;
 }
@@ -97,7 +97,7 @@ class L {
    * @param {string} config.customIcon - Custom icon HTML (for custom shape)
    */
   constructor(t) {
-    this.id = t.id || x("slot"), this.node = t.node, this.type = t.type, this.label = t.label || "", this.shape = t.shape || w.CIRCLE, this.side = t.side || (t.type === "input" ? "left" : "right"), this.align = t.align, this.edge = t.edge || !1, t.orientation ? this.orientation = t.orientation : this.orientation = this.side === "top" || this.side === "bottom" ? C.VERTICAL : C.HORIZONTAL, this.color = t.color || "#667eea", this.size = t.size || 12, this.clickAreaSize = t.clickAreaSize || this.size + 10, this.highlightOnHover = t.highlightOnHover !== !1, this.customIcon = t.customIcon || null, this.connections = /* @__PURE__ */ new Set(), this._createElement(), this._bindEvents();
+    this.id = t.id || _("slot"), this.node = t.node, this.type = t.type, this.label = t.label || "", this.shape = t.shape || w.CIRCLE, this.side = t.side || (t.type === "input" ? "left" : "right"), this.align = t.align, this.edge = t.edge || !1, t.orientation ? this.orientation = t.orientation : this.orientation = this.side === "top" || this.side === "bottom" ? C.VERTICAL : C.HORIZONTAL, this.color = t.color || "#667eea", this.size = t.size || 12, this.clickAreaSize = t.clickAreaSize || this.size + 10, this.highlightOnHover = t.highlightOnHover !== !1, this.customIcon = t.customIcon || null, t.maxConnections !== void 0 ? this.maxConnections = t.maxConnections : this.maxConnections = this.type === "input" ? 1 : 1 / 0, this.connections = /* @__PURE__ */ new Set(), this._createElement(), this._bindEvents();
   }
   /**
    * Create the slot DOM element
@@ -228,7 +228,7 @@ class P {
    */
   constructor(t) {
     var e, s;
-    this.id = t.id || x("node"), this.graph = t.graph, this.position = { x: ((e = t.position) == null ? void 0 : e.x) || 0, y: ((s = t.position) == null ? void 0 : s.y) || 0 }, this.draggable = t.draggable !== !1, this.selected = !1, this.resizable = t.resizable || !1, this.inputSlots = /* @__PURE__ */ new Map(), this.outputSlots = /* @__PURE__ */ new Map(), this.connections = /* @__PURE__ */ new Set(), this._createElement(t), this._createSlots(t.inputs, t.outputs), this._bindEvents(), this._updatePosition();
+    this.id = t.id || _("node"), this.graph = t.graph, this.position = { x: ((e = t.position) == null ? void 0 : e.x) || 0, y: ((s = t.position) == null ? void 0 : s.y) || 0 }, this.draggable = t.draggable !== !1, this.selected = !1, this.resizable = t.resizable || !1, this.inputSlots = /* @__PURE__ */ new Map(), this.outputSlots = /* @__PURE__ */ new Map(), this.connections = /* @__PURE__ */ new Set(), this._createElement(t), this._createSlots(t.inputs, t.outputs), this._bindEvents(), this._updatePosition();
   }
   /**
    * Create the node DOM element
@@ -273,8 +273,8 @@ class P {
       const l = (h = this.graph) == null ? void 0 : h.selection;
       s.clear(), l && l.isSelected(this) ? l.getSelectedNodes().forEach((p) => {
         s.set(p, { ...p.position }), p.element.classList.add("ng-node--dragging");
-      }) : (s.set(this, { ...this.position }), this.element.classList.add("ng-node--dragging")), document.addEventListener("mousemove", a), document.addEventListener("mouseup", o);
-    }, a = (n) => {
+      }) : (s.set(this, { ...this.position }), this.element.classList.add("ng-node--dragging")), document.addEventListener("mousemove", o), document.addEventListener("mouseup", a);
+    }, o = (n) => {
       var c, r;
       if (!t) return;
       const l = ((r = (c = this.graph) == null ? void 0 : c.viewport) == null ? void 0 : r.scale) || 1, h = (n.clientX - e.x) / l, p = (n.clientY - e.y) / l;
@@ -284,7 +284,7 @@ class P {
         bubbles: !0,
         detail: { node: this }
       }));
-    }, o = () => {
+    }, a = () => {
       var n, l, h;
       if (t) {
         if (t = !1, s.forEach((p, c) => {
@@ -301,7 +301,7 @@ class P {
         this.element.dispatchEvent(new CustomEvent("node:dragend", {
           bubbles: !0,
           detail: { node: this }
-        })), document.removeEventListener("mousemove", a), document.removeEventListener("mouseup", o), s.clear();
+        })), document.removeEventListener("mousemove", o), document.removeEventListener("mouseup", a), s.clear();
       }
     };
     if (this.element.addEventListener("mousedown", i), this.resizable && this.resizeHandle) {
@@ -536,11 +536,11 @@ class P {
     return "horizontal";
   }
 }
-function M(m, t, e = "horizontal", s = "horizontal") {
-  const i = t.x - m.x, a = t.y - m.y;
-  let o, n, l, h;
-  const p = Math.min(Math.abs(i) / 2, Math.abs(a) / 2, 100), r = Math.max(p, 50);
-  return e === "horizontal" ? (o = m.x + r, n = m.y) : (o = m.x, n = m.y + r), s === "horizontal" ? (l = t.x - r, h = t.y) : (l = t.x, h = t.y - r), `M ${m.x} ${m.y} C ${o} ${n}, ${l} ${h}, ${t.x} ${t.y}`;
+function A(m, t, e = "horizontal", s = "horizontal") {
+  const i = t.x - m.x, o = t.y - m.y;
+  let a, n, l, h;
+  const p = Math.min(Math.abs(i) / 2, Math.abs(o) / 2, 100), r = Math.max(p, 50);
+  return e === "horizontal" ? (a = m.x + r, n = m.y) : (a = m.x, n = m.y + r), s === "horizontal" ? (l = t.x - r, h = t.y) : (l = t.x, h = t.y - r), `M ${m.x} ${m.y} C ${a} ${n}, ${l} ${h}, ${t.x} ${t.y}`;
 }
 function Y(m, t) {
   return {
@@ -558,7 +558,7 @@ class N {
    */
   constructor(t) {
     var e, s, i;
-    this.id = t.id || x("conn"), this.outputSlot = t.outputSlot, this.inputSlot = t.inputSlot, this.svgLayer = t.svgLayer, this.style = {
+    this.id = t.id || _("conn"), this.outputSlot = t.outputSlot, this.inputSlot = t.inputSlot, this.svgLayer = t.svgLayer, this.style = {
       color: ((e = t.style) == null ? void 0 : e.color) || "#667eea",
       width: ((s = t.style) == null ? void 0 : s.width) || 2,
       dashed: ((i = t.style) == null ? void 0 : i.dashed) || !1,
@@ -602,8 +602,8 @@ class N {
   * Update the path based on slot positions
   */
   updatePath() {
-    const t = this.outputSlot.getConnectionPoint(), e = this.inputSlot.getConnectionPoint(), s = this.outputSlot.orientation || "horizontal", i = this.inputSlot.orientation || "horizontal", a = M(t, e, s, i);
-    this.pathElement.setAttribute("d", a);
+    const t = this.outputSlot.getConnectionPoint(), e = this.inputSlot.getConnectionPoint(), s = this.outputSlot.orientation || "horizontal", i = this.inputSlot.orientation || "horizontal", o = A(t, e, s, i);
+    this.pathElement.setAttribute("d", o);
   }
   /**
    * Select this connection
@@ -648,7 +648,7 @@ class N {
     };
   }
 }
-class A {
+class M {
   /**
    * @param {object} config - Group configuration
    * @param {NodeGraph} config.graph - Parent graph
@@ -660,8 +660,8 @@ class A {
    * @param {number} config.padding - Padding around nodes
    */
   constructor(t) {
-    var e, s, i, a;
-    this.id = t.id || x("group"), this.graph = t.graph, this.label = t.label || "Group", this.color = t.color || "rgba(102, 126, 234, 0.1)", this.position = { x: ((e = t.position) == null ? void 0 : e.x) || 0, y: ((s = t.position) == null ? void 0 : s.y) || 0 }, this.size = { width: ((i = t.size) == null ? void 0 : i.width) || 200, height: ((a = t.size) == null ? void 0 : a.height) || 150 }, this.padding = t.padding || 20, this.nodes = /* @__PURE__ */ new Set(), this._createElement(), this._bindEvents(), this._updateStyle();
+    var e, s, i, o;
+    this.id = t.id || _("group"), this.graph = t.graph, this.label = t.label || "Group", this.color = t.color || "rgba(102, 126, 234, 0.1)", this.position = { x: ((e = t.position) == null ? void 0 : e.x) || 0, y: ((s = t.position) == null ? void 0 : s.y) || 0 }, this.size = { width: ((i = t.size) == null ? void 0 : i.width) || 200, height: ((o = t.size) == null ? void 0 : o.height) || 150 }, this.padding = t.padding || 20, this.nodes = /* @__PURE__ */ new Set(), this._createElement(), this._bindEvents(), this._updateStyle();
   }
   /**
    * Create the group DOM element
@@ -673,38 +673,38 @@ class A {
    * Bind event listeners
    */
   _bindEvents() {
-    let t = !1, e = !1, s = { x: 0, y: 0 }, i = { x: 0, y: 0 }, a = { width: 0, height: 0 };
-    this.headerElement.addEventListener("mousedown", (o) => {
-      if (o.button !== 0) return;
-      o.stopPropagation(), t = !0, s = { x: o.clientX, y: o.clientY }, i = { ...this.position };
+    let t = !1, e = !1, s = { x: 0, y: 0 }, i = { x: 0, y: 0 }, o = { width: 0, height: 0 };
+    this.headerElement.addEventListener("mousedown", (a) => {
+      if (a.button !== 0) return;
+      a.stopPropagation(), t = !0, s = { x: a.clientX, y: a.clientY }, i = { ...this.position };
       const n = [], l = this._getGraphRect();
       this.graph.nodes.forEach((h) => {
         const p = h.getBounds();
         this._rectsIntersect(l, p) && n.push(h);
       }), this.collidingNodes = n, this.element.classList.add("ng-group--dragging");
-    }), this.resizeHandle.addEventListener("mousedown", (o) => {
-      o.button === 0 && (o.stopPropagation(), e = !0, s = { x: o.clientX, y: o.clientY }, a = { ...this.size }, this.element.classList.add("ng-group--resizing"));
-    }), document.addEventListener("mousemove", (o) => {
+    }), this.resizeHandle.addEventListener("mousedown", (a) => {
+      a.button === 0 && (a.stopPropagation(), e = !0, s = { x: a.clientX, y: a.clientY }, o = { ...this.size }, this.element.classList.add("ng-group--resizing"));
+    }), document.addEventListener("mousemove", (a) => {
       var l, h;
       const n = ((h = (l = this.graph) == null ? void 0 : l.viewport) == null ? void 0 : h.scale) || 1;
       if (t) {
-        const p = (o.clientX - s.x) / n, c = (o.clientY - s.y) / n;
+        const p = (a.clientX - s.x) / n, c = (a.clientY - s.y) / n;
         this.position.x = i.x + p, this.position.y = i.y + c, this._updatePosition(), this.collidingNodes && (this.collidingNodes.forEach((r) => {
           r.moveBy(p - (this.lastDx || 0), c - (this.lastDy || 0));
         }), this.lastDx = p, this.lastDy = c);
       }
       if (e) {
-        const p = (o.clientX - s.x) / n, c = (o.clientY - s.y) / n;
-        this.size.width = Math.max(100, a.width + p), this.size.height = Math.max(60, a.height + c), this._updateSize(), a = { ...this.size }, s = { x: o.clientX, y: o.clientY };
+        const p = (a.clientX - s.x) / n, c = (a.clientY - s.y) / n;
+        this.size.width = Math.max(100, o.width + p), this.size.height = Math.max(60, o.height + c), this._updateSize(), o = { ...this.size }, s = { x: a.clientX, y: a.clientY };
       }
     }), document.addEventListener("mouseup", () => {
       t && (t = !1, this.element.classList.remove("ng-group--dragging"), this.collidingNodes = null, this.lastDx = 0, this.lastDy = 0), e && (e = !1, this.element.classList.remove("ng-group--resizing"));
-    }), this.labelElement.addEventListener("dblclick", (o) => {
-      o.stopPropagation(), this._startEditLabel();
-    }), this.element.addEventListener("contextmenu", (o) => {
-      o.preventDefault(), o.stopPropagation(), this.element.dispatchEvent(new CustomEvent("group:contextmenu", {
+    }), this.labelElement.addEventListener("dblclick", (a) => {
+      a.stopPropagation(), this._startEditLabel();
+    }), this.element.addEventListener("contextmenu", (a) => {
+      a.preventDefault(), a.stopPropagation(), this.element.dispatchEvent(new CustomEvent("group:contextmenu", {
         bubbles: !0,
-        detail: { group: this, event: o }
+        detail: { group: this, event: a }
       }));
     });
   }
@@ -719,8 +719,8 @@ class A {
     e.removeAllRanges(), e.addRange(t);
     const s = () => {
       this.labelElement.contentEditable = !1, this.label = this.labelElement.textContent || "Group", this.labelElement.removeEventListener("blur", s), this.labelElement.removeEventListener("keydown", i);
-    }, i = (a) => {
-      a.key === "Enter" && (a.preventDefault(), s()), a.key === "Escape" && (this.labelElement.textContent = this.label, s());
+    }, i = (o) => {
+      o.key === "Enter" && (o.preventDefault(), s()), o.key === "Escape" && (this.labelElement.textContent = this.label, s());
     };
     this.labelElement.addEventListener("blur", s), this.labelElement.addEventListener("keydown", i);
   }
@@ -776,9 +776,9 @@ class A {
   fitToNodes() {
     if (this.nodes.size === 0) return;
     let t = 1 / 0, e = 1 / 0, s = -1 / 0, i = -1 / 0;
-    this.nodes.forEach((a) => {
-      const o = a.getBounds();
-      t = Math.min(t, o.x), e = Math.min(e, o.y), s = Math.max(s, o.x + o.width), i = Math.max(i, o.y + o.height);
+    this.nodes.forEach((o) => {
+      const a = o.getBounds();
+      t = Math.min(t, a.x), e = Math.min(e, a.y), s = Math.max(s, a.x + a.width), i = Math.max(i, a.y + a.height);
     }), this.position.x = t - this.padding, this.position.y = e - this.padding - 30, this.size.width = s - t + this.padding * 2, this.size.height = i - e + this.padding * 2 + 30, this._updatePosition(), this._updateSize();
   }
   /**
@@ -798,8 +798,8 @@ class A {
    * Check if two rects intersect
    */
   _rectsIntersect(t, e) {
-    const s = t.left + t.width, i = t.top + t.height, a = e.x + e.width, o = e.y + e.height;
-    return !(t.left > a || s < e.x || t.top > o || i < e.y);
+    const s = t.left + t.width, i = t.top + t.height, o = e.x + e.width, a = e.y + e.height;
+    return !(t.left > o || s < e.x || t.top > a || i < e.y);
   }
   /**
    * Destroy the group
@@ -832,12 +832,12 @@ class T {
    * @param {object} config.options - Zoom/pan options
    */
   constructor(t) {
-    var e, s, i, a;
+    var e, s, i, o;
     this.container = t.container, this.content = t.content, this.options = {
       minZoom: ((e = t.options) == null ? void 0 : e.minZoom) || 0.1,
       maxZoom: ((s = t.options) == null ? void 0 : s.maxZoom) || 4,
       zoomSpeed: ((i = t.options) == null ? void 0 : i.zoomSpeed) || 0.1,
-      panButton: ((a = t.options) == null ? void 0 : a.panButton) || 1,
+      panButton: ((o = t.options) == null ? void 0 : o.panButton) || 1,
       // Middle mouse button
       ...t.options
     }, this.scale = 1, this.panX = 0, this.panY = 0, this._isPanning = !1, this._panStartX = 0, this._panStartY = 0, this._spacePressed = !1, this._bindEvents();
@@ -854,8 +854,8 @@ class T {
   _bindEvents() {
     this.container.addEventListener("wheel", (t) => {
       t.preventDefault();
-      const e = this.container.getBoundingClientRect(), s = t.clientX - e.left, i = t.clientY - e.top, o = 1 + (t.deltaY > 0 ? -1 : 1) * this.options.zoomSpeed;
-      this.zoomAt(s, i, o);
+      const e = this.container.getBoundingClientRect(), s = t.clientX - e.left, i = t.clientY - e.top, a = 1 + (t.deltaY > 0 ? -1 : 1) * this.options.zoomSpeed;
+      this.zoomAt(s, i, a);
     }, { passive: !1 }), this.container.addEventListener("mousedown", (t) => {
       (t.button === this.options.panButton || t.button === 0 && this._spacePressed) && (t.preventDefault(), this._startPan(t));
     }), document.addEventListener("mousemove", z((t) => {
@@ -901,8 +901,8 @@ class T {
   zoomAt(t, e, s) {
     const i = Math.min(Math.max(this.scale * s, this.options.minZoom), this.options.maxZoom);
     if (i === this.scale) return;
-    const a = i / this.scale;
-    this.panX = t - (t - this.panX) * a, this.panY = e - (e - this.panY) * a, this.scale = i, this._applyTransform();
+    const o = i / this.scale;
+    this.panX = t - (t - this.panX) * o, this.panY = e - (e - this.panY) * o, this.scale = i, this._applyTransform();
   }
   /**
    * Set zoom level
@@ -1011,8 +1011,8 @@ class $ {
    * Update box selection
    */
   _updateBoxSelection(t) {
-    const e = this.graph.viewport.screenToGraph(t.clientX, t.clientY), s = Math.min(this._boxStart.x, e.x), i = Math.min(this._boxStart.y, e.y), a = Math.abs(e.x - this._boxStart.x), o = Math.abs(e.y - this._boxStart.y);
-    this._boxElement.style.left = `${s}px`, this._boxElement.style.top = `${i}px`, this._boxElement.style.width = `${a}px`, this._boxElement.style.height = `${o}px`;
+    const e = this.graph.viewport.screenToGraph(t.clientX, t.clientY), s = Math.min(this._boxStart.x, e.x), i = Math.min(this._boxStart.y, e.y), o = Math.abs(e.x - this._boxStart.x), a = Math.abs(e.y - this._boxStart.y);
+    this._boxElement.style.left = `${s}px`, this._boxElement.style.top = `${i}px`, this._boxElement.style.width = `${o}px`, this._boxElement.style.height = `${a}px`;
   }
   /**
    * End box selection
@@ -1131,13 +1131,13 @@ class D {
    * @param {object} config.options - Grid options
    */
   constructor(t) {
-    var e, s, i, a, o;
+    var e, s, i, o, a;
     this.svgLayer = t.svgLayer, this.options = {
       enabled: ((e = t.options) == null ? void 0 : e.enabled) !== !1,
       step: ((s = t.options) == null ? void 0 : s.step) || 20,
       color: ((i = t.options) == null ? void 0 : i.color) || "rgba(255,255,255,0.05)",
-      majorLineEvery: ((a = t.options) == null ? void 0 : a.majorLineEvery) || 5,
-      majorColor: ((o = t.options) == null ? void 0 : o.majorColor) || "rgba(255,255,255,0.1)",
+      majorLineEvery: ((o = t.options) == null ? void 0 : o.majorLineEvery) || 5,
+      majorColor: ((a = t.options) == null ? void 0 : a.majorColor) || "rgba(255,255,255,0.1)",
       ...t.options
     }, this._gridGroup = null, this._pattern = null, this.options.enabled && this._createGrid();
   }
@@ -1149,11 +1149,11 @@ class D {
     t || (t = document.createElementNS("http://www.w3.org/2000/svg", "defs"), this.svgLayer.insertBefore(t, this.svgLayer.firstChild));
     const e = this.options.step, s = e * this.options.majorLineEvery;
     this._pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern"), this._pattern.setAttribute("id", "ng-grid-pattern"), this._pattern.setAttribute("width", s), this._pattern.setAttribute("height", s), this._pattern.setAttribute("patternUnits", "userSpaceOnUse");
-    for (let a = 0; a <= this.options.majorLineEvery; a++) {
-      const o = a * e, n = a * e, l = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      l.setAttribute("x1", o), l.setAttribute("y1", 0), l.setAttribute("x2", o), l.setAttribute("y2", s), l.setAttribute("stroke", a === 0 ? this.options.majorColor : this.options.color), l.setAttribute("stroke-width", a === 0 ? 1 : 0.5), this._pattern.appendChild(l);
+    for (let o = 0; o <= this.options.majorLineEvery; o++) {
+      const a = o * e, n = o * e, l = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      l.setAttribute("x1", a), l.setAttribute("y1", 0), l.setAttribute("x2", a), l.setAttribute("y2", s), l.setAttribute("stroke", o === 0 ? this.options.majorColor : this.options.color), l.setAttribute("stroke-width", o === 0 ? 1 : 0.5), this._pattern.appendChild(l);
       const h = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      h.setAttribute("x1", 0), h.setAttribute("y1", n), h.setAttribute("x2", s), h.setAttribute("y2", n), h.setAttribute("stroke", a === 0 ? this.options.majorColor : this.options.color), h.setAttribute("stroke-width", a === 0 ? 1 : 0.5), this._pattern.appendChild(h);
+      h.setAttribute("x1", 0), h.setAttribute("y1", n), h.setAttribute("x2", s), h.setAttribute("y2", n), h.setAttribute("stroke", o === 0 ? this.options.majorColor : this.options.color), h.setAttribute("stroke-width", o === 0 ? 1 : 0.5), this._pattern.appendChild(h);
     }
     t.appendChild(this._pattern), this._gridGroup = document.createElementNS("http://www.w3.org/2000/svg", "g"), this._gridGroup.classList.add("ng-grid");
     const i = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -1336,8 +1336,8 @@ class R {
       action: (t) => {
         const e = document.createElement("input");
         e.type = "color", e.value = "#667eea", e.style.position = "absolute", e.style.opacity = "0", e.style.pointerEvents = "none", document.body.appendChild(e), e.addEventListener("input", (s) => {
-          const i = s.target.value, a = parseInt(i.slice(1, 3), 16), o = parseInt(i.slice(3, 5), 16), n = parseInt(i.slice(5, 7), 16);
-          t.group.setColor(`rgba(${a}, ${o}, ${n}, 0.1)`);
+          const i = s.target.value, o = parseInt(i.slice(1, 3), 16), a = parseInt(i.slice(3, 5), 16), n = parseInt(i.slice(5, 7), 16);
+          t.group.setColor(`rgba(${o}, ${a}, ${n}, 0.1)`);
         }), e.addEventListener("change", () => {
           e.remove();
         }), e.click();
@@ -1403,9 +1403,9 @@ class R {
    */
   open(t, e, s, i = {}) {
     this.close();
-    const a = this.menuItems[t];
-    if (!a || a.length === 0) return;
-    this.menuElement = document.createElement("div"), this.menuElement.className = "ng-context-menu", a.forEach((n) => {
+    const o = this.menuItems[t];
+    if (!o || o.length === 0) return;
+    this.menuElement = document.createElement("div"), this.menuElement.className = "ng-context-menu", o.forEach((n) => {
       if (n.type === "separator") {
         const c = document.createElement("div");
         c.className = "ng-context-menu-separator", this.menuElement.appendChild(c);
@@ -1425,8 +1425,8 @@ class R {
         c.stopPropagation(), n.action(i), this.close();
       }), this.menuElement.appendChild(h);
     }), this.menuElement.style.left = `${e}px`, this.menuElement.style.top = `${s}px`, document.body.appendChild(this.menuElement), this.isOpen = !0;
-    const o = this.menuElement.getBoundingClientRect();
-    o.right > window.innerWidth && (this.menuElement.style.left = `${e - o.width}px`), o.bottom > window.innerHeight && (this.menuElement.style.top = `${s - o.height}px`);
+    const a = this.menuElement.getBoundingClientRect();
+    a.right > window.innerWidth && (this.menuElement.style.left = `${e - a.width}px`), a.bottom > window.innerHeight && (this.menuElement.style.top = `${s - a.height}px`);
   }
   /**
    * Close context menu
@@ -1473,12 +1473,12 @@ class X {
     const i = t.map((l) => {
       const h = l.serialize();
       return h.position.x -= e, h.position.y -= s, h;
-    }), a = new Set(t.map((l) => l.id)), o = [];
+    }), o = new Set(t.map((l) => l.id)), a = [];
     this.graph.connections.forEach((l) => {
-      a.has(l.outputSlot.node.id) && a.has(l.inputSlot.node.id) && o.push(l.serialize());
+      o.has(l.outputSlot.node.id) && o.has(l.inputSlot.node.id) && a.push(l.serialize());
     }), this._clipboardData = {
       nodes: i,
-      connections: o
+      connections: a
     }, this.graph.emit("clipboard:copy", { nodes: t });
   }
   /**
@@ -1492,18 +1492,18 @@ class X {
   * Paste nodes from clipboard
   */
   paste() {
-    var a, o;
+    var o, a;
     if (!this._clipboardData) return;
     let t, e;
     if (this.graph.lastMousePos) {
       const n = this.graph.viewport.screenToGraph(this.graph.lastMousePos.x, this.graph.lastMousePos.y);
       t = n.x, e = n.y;
     } else {
-      const n = ((a = this.graph.viewport) == null ? void 0 : a.getState()) || { panX: 0, panY: 0, scale: 1 }, l = this.graph.container.getBoundingClientRect();
+      const n = ((o = this.graph.viewport) == null ? void 0 : o.getState()) || { panX: 0, panY: 0, scale: 1 }, l = this.graph.container.getBoundingClientRect();
       t = (l.width / 2 - n.panX) / n.scale, e = (l.height / 2 - n.panY) / n.scale;
     }
     const s = /* @__PURE__ */ new Map();
-    (o = this.graph.selection) == null || o.clearSelection();
+    (a = this.graph.selection) == null || a.clearSelection();
     const i = [];
     this._clipboardData.nodes.forEach((n) => {
       var p;
@@ -1644,9 +1644,9 @@ class k extends I {
    */
   _updateConnectionDrag(t) {
     if (!this._connectionDrag || !this._tempPath) return;
-    const e = this.viewport.screenToGraph(t.clientX, t.clientY), s = this._connectionDrag.startPos, i = this._connectionDrag.sourceSlot.orientation, a = e.x - s.x, o = Math.max(Math.abs(a) / 2, 50);
+    const e = this.viewport.screenToGraph(t.clientX, t.clientY), s = this._connectionDrag.startPos, i = this._connectionDrag.sourceSlot.orientation, o = e.x - s.x, a = Math.max(Math.abs(o) / 2, 50);
     let n;
-    i === "horizontal" ? n = `M ${s.x} ${s.y} C ${s.x + o} ${s.y}, ${e.x - o} ${e.y}, ${e.x} ${e.y}` : n = `M ${s.x} ${s.y} C ${s.x} ${s.y + o}, ${e.x} ${e.y - o}, ${e.x} ${e.y}`, this._tempPath.setAttribute("d", n);
+    i === "horizontal" ? n = `M ${s.x} ${s.y} C ${s.x + a} ${s.y}, ${e.x - a} ${e.y}, ${e.x} ${e.y}` : n = `M ${s.x} ${s.y} C ${s.x} ${s.y + a}, ${e.x} ${e.y - a}, ${e.x} ${e.y}`, this._tempPath.setAttribute("d", n);
     const l = document.elementFromPoint(t.clientX, t.clientY), h = l == null ? void 0 : l.closest(".ng-slot-click-area"), p = h == null ? void 0 : h.closest(".ng-slot");
     let c = null;
     if (p) {
@@ -1695,7 +1695,20 @@ class k extends I {
     }
     if (e && this._connectionDrag.isValid) {
       const s = this._connectionDrag.sourceSlot;
-      s.type === "output" && e.type === "input" ? this.connect(s, e) : s.type === "input" && e.type === "output" && this.connect(e, s);
+      let i, o;
+      if (s.type === "output" && e.type === "input" ? (i = s, o = e) : s.type === "input" && e.type === "output" && (i = e, o = s), i && o) {
+        if (o.connections.size >= o.maxConnections) {
+          const a = o.connections.size - o.maxConnections + 1, n = Array.from(o.connections);
+          for (let l = 0; l < a; l++)
+            this.disconnect(n[l].id);
+        }
+        if (i.connections.size >= i.maxConnections) {
+          const a = i.connections.size - i.maxConnections + 1, n = Array.from(i.connections);
+          for (let l = 0; l < a; l++)
+            this.disconnect(n[l].id);
+        }
+        this.connect(i, o);
+      }
     }
     this._tempPath && (this._tempPath.remove(), this._tempPath = null), this._connectionDrag = null;
   }
@@ -1749,9 +1762,9 @@ class k extends I {
   connect(t, e, s = {}) {
     if (t.type !== "output" || e.type !== "input")
       return console.warn("NodeGraph: Invalid connection - must be output to input"), null;
-    for (const a of this.connections.values())
-      if (a.outputSlot === t && a.inputSlot === e)
-        return a;
+    for (const o of this.connections.values())
+      if (o.outputSlot === t && o.inputSlot === e)
+        return o;
     const i = new N({
       outputSlot: t,
       inputSlot: e,
@@ -1792,7 +1805,7 @@ class k extends I {
    * @returns {Group} Created group
    */
   addGroup(t) {
-    const e = new A({
+    const e = new M({
       ...t,
       graph: this
     });
@@ -1834,14 +1847,14 @@ class k extends I {
     }), t.connections && t.connections.forEach((e) => {
       const s = this.nodes.get(e.outputNodeId), i = this.nodes.get(e.inputNodeId);
       if (s && i) {
-        const a = s.getOutput(e.outputSlotId), o = i.getInput(e.inputSlotId);
-        a && o && this.connect(a, o, e.style);
+        const o = s.getOutput(e.outputSlotId), a = i.getInput(e.inputSlotId);
+        o && a && this.connect(o, a, e.style);
       }
     }), t.groups && t.groups.forEach((e) => {
       const s = this.addGroup(e);
       e.nodeIds && e.nodeIds.forEach((i) => {
-        const a = this.nodes.get(i);
-        a && s.addNode(a);
+        const o = this.nodes.get(i);
+        o && s.addNode(o);
       });
     }), t.viewport && this.viewport.setState(t.viewport), this.emit("graph:deserialize", t);
   }
@@ -1851,7 +1864,7 @@ class k extends I {
   arrange() {
     const t = Array.from(this.nodes.values());
     if (t.length === 0) return;
-    const e = 250, s = 120, i = 80, a = 100, o = 100, n = /* @__PURE__ */ new Set(), l = [];
+    const e = 250, s = 120, i = 80, o = 100, a = 100, n = /* @__PURE__ */ new Set(), l = [];
     t.forEach((u) => {
       if (n.has(u.id)) return;
       const y = [], f = [u];
@@ -1859,7 +1872,7 @@ class k extends I {
       let E = 0;
       for (; E < f.length; ) {
         const b = f[E++], S = /* @__PURE__ */ new Set();
-        b.inputSlots.forEach((v) => v.connections.forEach((_) => _.outputSlot.node && S.add(_.outputSlot.node))), b.outputSlots.forEach((v) => v.connections.forEach((_) => _.inputSlot.node && S.add(_.inputSlot.node))), S.forEach((v) => {
+        b.inputSlots.forEach((v) => v.connections.forEach((x) => x.outputSlot.node && S.add(x.outputSlot.node))), b.outputSlots.forEach((v) => v.connections.forEach((x) => x.inputSlot.node && S.add(x.inputSlot.node))), S.forEach((v) => {
           n.has(v.id) || (n.add(v.id), y.push(v), f.push(v));
         });
       }
@@ -1873,7 +1886,7 @@ class k extends I {
     let r = 0, d = 0, g = 0;
     l.sort((u, y) => y.height - u.height), l.forEach((u) => {
       r + u.width > c && r > 0 && (r = 0, d += g + i, g = 0);
-      const y = a + r, f = o + d;
+      const y = o + r, f = a + d;
       u.placements.forEach((E) => {
         E.node.moveTo(y + E.x, f + E.y);
       }), r += u.width + i, g = Math.max(g, u.height);
@@ -1885,7 +1898,7 @@ class k extends I {
    */
   _layoutIsland(t, e, s) {
     if (t.length === 0) return { width: 0, height: 0, placements: [] };
-    const i = /* @__PURE__ */ new Map(), a = t.filter((r) => {
+    const i = /* @__PURE__ */ new Map(), o = t.filter((r) => {
       let d = !1;
       return r.inputSlots.forEach((g) => {
         g.connections.forEach((u) => {
@@ -1893,16 +1906,16 @@ class k extends I {
         });
       }), !d;
     });
-    a.length === 0 && a.push(t[0]);
-    const o = [], n = /* @__PURE__ */ new Set();
-    for (a.forEach((r) => {
-      i.set(r.id, 0), o.push(r), n.add(r.id);
-    }); o.length > 0; ) {
-      const r = o.shift(), d = i.get(r.id);
+    o.length === 0 && o.push(t[0]);
+    const a = [], n = /* @__PURE__ */ new Set();
+    for (o.forEach((r) => {
+      i.set(r.id, 0), a.push(r), n.add(r.id);
+    }); a.length > 0; ) {
+      const r = a.shift(), d = i.get(r.id);
       r.outputSlots.forEach((g) => {
         g.connections.forEach((u) => {
           const y = u.inputSlot.node;
-          t.includes(y) && (!n.has(y.id) || i.get(y.id) < d + 1) && (i.set(y.id, d + 1), n.add(y.id), o.push(y));
+          t.includes(y) && (!n.has(y.id) || i.get(y.id) < d + 1) && (i.set(y.id, d + 1), n.add(y.id), a.push(y));
         });
       });
     }
@@ -1956,7 +1969,7 @@ export {
   R as ContextMenuManager,
   I as EventEmitter,
   D as GridManager,
-  A as Group,
+  M as Group,
   P as Node,
   k as NodeGraph,
   $ as SelectionManager,
@@ -1964,9 +1977,9 @@ export {
   C as SlotOrientation,
   w as SlotShape,
   T as ViewportManager,
-  M as calculateBezierPath,
+  A as calculateBezierPath,
   B as debounce,
   Y as getBezierMidpoint,
   z as throttle,
-  x as uid
+  _ as uid
 };

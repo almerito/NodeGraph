@@ -71,6 +71,14 @@ export class Slot {
         this.clickAreaSize = config.clickAreaSize || this.size + 10;
         this.highlightOnHover = config.highlightOnHover !== false;
         this.customIcon = config.customIcon || null;
+
+        // Connections limit
+        if (config.maxConnections !== undefined) {
+            this.maxConnections = config.maxConnections;
+        } else {
+            this.maxConnections = this.type === 'input' ? 1 : Infinity;
+        }
+
         this.connections = new Set();
 
         this._createElement();

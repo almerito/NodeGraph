@@ -359,13 +359,40 @@ export class NodeGraph extends EventEmitter {
             // Create connection
             const sourceSlot = this._connectionDrag.sourceSlot;
 
-            // Check if already connected logic is inside connect() but we can check here too or rely on connect()
-
-            // Determine direction (output -> input)
+            let outputSlot, inputSlot;
             if (sourceSlot.type === 'output' && targetSlot.type === 'input') {
-                this.connect(sourceSlot, targetSlot);
+                outputSlot = sourceSlot;
+                inputSlot = targetSlot;
             } else if (sourceSlot.type === 'input' && targetSlot.type === 'output') {
-                this.connect(targetSlot, sourceSlot);
+                outputSlot = targetSlot;
+                inputSlot = sourceSlot;
+            }
+
+            if (outputSlot && inputSlot) {
+                // Check limits and auto-disconnect if needed
+
+                // 1. Check Input Slot Limit (User explicitly asked for replace)
+                if (inputSlot.connections.size >= inputSlot.maxConnections) {
+                    // Remove oldest or all? Typically replace implies removing existing to make room.
+                    // If max is 1, remove the one. If max is 2 and we have 2, remove one? 
+                    // Let's remove enough to make room.
+                    const toRemoveCount = inputSlot.connections.size - inputSlot.maxConnections + 1;
+                    const connections = Array.from(inputSlot.connections);
+                    for (let i = 0; i < toRemoveCount; i++) {
+                        this.disconnect(connections[i].id);
+                    }
+                }
+
+                // 2. Check Output Slot Limit
+                if (outputSlot.connections.size >= outputSlot.maxConnections) {
+                    const toRemoveCount = outputSlot.connections.size - outputSlot.maxConnections + 1;
+                    const connections = Array.from(outputSlot.connections);
+                    for (let i = 0; i < toRemoveCount; i++) {
+                        this.disconnect(connections[i].id);
+                    }
+                }
+
+                this.connect(outputSlot, inputSlot);
             }
         }
 
