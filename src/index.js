@@ -4,6 +4,8 @@
  * @module nodegraph
  */
 
+import './styles/nodegraph.css';
+
 // Core classes
 export { NodeGraph } from './NodeGraph.js';
 export { Node } from './Node.js';

@@ -1,10 +1,18 @@
 {
-  "name": "nodegraph",
+  "name": "nodegraph-js",
   "version": "1.0.0",
   "description": "A customizable node graph library for JavaScript",
   "type": "module",
   "main": "dist/nodegraph.js",
   "module": "dist/nodegraph.js",
+  "style": "dist/nodegraph.css",
+  "exports": {
+    ".": {
+      "import": "./dist/nodegraph.js",
+      "require": "./dist/nodegraph.umd.cjs"
+    },
+    "./style.css": "./dist/nodegraph.css"
+  },
   "files": [
     "dist"
   ],
@@ -21,7 +29,7 @@
     "connections"
   ],
   "author": "",
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "devDependencies": {
     "vite": "^6.0.0"
   }
