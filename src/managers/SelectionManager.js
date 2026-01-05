@@ -205,11 +205,16 @@ export class SelectionManager {
     /**
      * Select a connection
      * @param {Connection} connection - Connection to select
+     * @param {boolean} additive - Add to selection instead of replacing
      */
-    selectConnection(connection) {
-        this.clearConnectionSelection();
-        this.selectedConnections.add(connection);
-        connection.select();
+    selectConnection(connection, additive = false) {
+        if (!additive) {
+            this.clearSelection(); // Deselect all nodes and other connections
+        }
+        if (!this.selectedConnections.has(connection)) {
+            this.selectedConnections.add(connection);
+            connection.select();
+        }
     }
 
     /**
@@ -227,7 +232,7 @@ export class SelectionManager {
         this.selectedNodes.forEach(node => node.deselect());
         this.selectedNodes.clear();
         this.clearConnectionSelection();
-        this.graph.emit('selection:change', { nodes: [] });
+        this.graph.emit('selection:change', { nodes: [], connections: [] });
     }
 
     /**
@@ -237,6 +242,8 @@ export class SelectionManager {
         this.graph.nodes.forEach(node => {
             this.addToSelection(node);
         });
+        // Optionally select connections too? 
+        // User asked for "Select All" usually implies nodes.
     }
 
     /**
@@ -255,7 +262,7 @@ export class SelectionManager {
         });
         this.selectedNodes.clear();
 
-        this.graph.emit('selection:change', { nodes: [] });
+        this.graph.emit('selection:change', { nodes: [], connections: [] });
     }
 
     /**

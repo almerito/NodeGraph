@@ -51,7 +51,7 @@ function z(u, t) {
     e || (u.apply(this, s), e = !0, setTimeout(() => e = !1, t));
   };
 }
-function X(u, t) {
+function B(u, t) {
   let e;
   return function(...s) {
     clearTimeout(e), e = setTimeout(() => u.apply(this, s), t);
@@ -141,6 +141,13 @@ class L {
       x: this.node.position.x + s,
       y: this.node.position.y + i
     };
+  }
+  /**
+   * Highlight the slot
+   * @param {boolean} active - Active state
+   */
+  highlight(t) {
+    t ? this.connectorElement.classList.add("ng-slot-connector--highlight") : this.connectorElement.classList.remove("ng-slot-connector--highlight");
   }
   /**
    * Set slot color
@@ -535,7 +542,7 @@ function M(u, t, e = "horizontal", s = "horizontal") {
   const p = Math.min(Math.abs(i) / 2, Math.abs(a) / 2, 100), r = Math.max(p, 50);
   return e === "horizontal" ? (o = u.x + r, n = u.y) : (o = u.x, n = u.y + r), s === "horizontal" ? (h = t.x - r, l = t.y) : (h = t.x, l = t.y - r), `M ${u.x} ${u.y} C ${o} ${n}, ${h} ${l}, ${t.x} ${t.y}`;
 }
-function k(u, t) {
+function Y(u, t) {
   return {
     x: (u.x + t.x) / 2,
     y: (u.y + t.y) / 2
@@ -574,8 +581,17 @@ class N {
    * Bind event listeners
    */
   _bindEvents() {
+    if (this.style.dashed) {
+      this.pathElement.style.pointerEvents = "none";
+      return;
+    }
     this.pathElement.addEventListener("click", (t) => {
-      t.stopPropagation(), this.select();
+      t.stopPropagation(), this.outputSlot.node.graph && this.outputSlot.node.graph.selection.selectConnection(this, t.ctrlKey || t.metaKey);
+    }), this.pathElement.addEventListener("contextmenu", (t) => {
+      t.preventDefault(), t.stopPropagation(), this.outputSlot.node.graph && !this.selected && this.outputSlot.node.graph.selection.selectConnection(this), this.pathElement.dispatchEvent(new CustomEvent("connection:contextmenu", {
+        bubbles: !0,
+        detail: { connection: this, event: t }
+      }));
     }), this.pathElement.addEventListener("mouseenter", () => {
       this.pathElement.classList.add("ng-connection--hover");
     }), this.pathElement.addEventListener("mouseleave", () => {
@@ -1057,9 +1073,10 @@ class $ {
   /**
    * Select a connection
    * @param {Connection} connection - Connection to select
+   * @param {boolean} additive - Add to selection instead of replacing
    */
-  selectConnection(t) {
-    this.clearConnectionSelection(), this.selectedConnections.add(t), t.select();
+  selectConnection(t, e = !1) {
+    e || this.clearSelection(), this.selectedConnections.has(t) || (this.selectedConnections.add(t), t.select());
   }
   /**
    * Clear connection selection
@@ -1071,7 +1088,7 @@ class $ {
    * Clear all selection
    */
   clearSelection() {
-    this.selectedNodes.forEach((t) => t.deselect()), this.selectedNodes.clear(), this.clearConnectionSelection(), this.graph.emit("selection:change", { nodes: [] });
+    this.selectedNodes.forEach((t) => t.deselect()), this.selectedNodes.clear(), this.clearConnectionSelection(), this.graph.emit("selection:change", { nodes: [], connections: [] });
   }
   /**
    * Select all nodes
@@ -1089,7 +1106,7 @@ class $ {
       this.graph.disconnect(t.id);
     }), this.selectedConnections.clear(), this.selectedNodes.forEach((t) => {
       this.graph.removeNode(t.id);
-    }), this.selectedNodes.clear(), this.graph.emit("selection:change", { nodes: [] });
+    }), this.selectedNodes.clear(), this.graph.emit("selection:change", { nodes: [], connections: [] });
   }
   /**
    * Get selected nodes
@@ -1417,7 +1434,7 @@ class R {
     this.close();
   }
 }
-class B {
+class X {
   /**
    * @param {NodeGraph} graph - Parent graph
    */
@@ -1527,7 +1544,7 @@ class B {
     this._clipboardData = null;
   }
 }
-class Y extends I {
+class k extends I {
   /**
    * @param {string|HTMLElement} container - Container element or selector
    * @param {object} options - Graph options
@@ -1568,7 +1585,7 @@ class Y extends I {
     }), this.selection = new $(this), this.grid = new D({
       svgLayer: this.svgLayer,
       options: this.options.grid
-    }), this.contextMenu = new R(this), this.clipboard = new B(this);
+    }), this.contextMenu = new R(this), this.clipboard = new X(this);
   }
   /**
    * Bind global event listeners
@@ -1597,6 +1614,9 @@ class Y extends I {
     }), this.groupsLayer.addEventListener("group:contextmenu", (t) => {
       const { group: e, event: s } = t.detail;
       this.contextMenu.open("group", s.clientX, s.clientY, { group: e });
+    }), this.connectionsGroup.addEventListener("connection:contextmenu", (t) => {
+      const { connection: e, event: s } = t.detail;
+      this.contextMenu.open("connection", s.clientX, s.clientY, { connection: e });
     }), document.addEventListener("mousemove", (t) => {
       this.lastMousePos = { x: t.clientX, y: t.clientY }, this._connectionDrag && this._updateConnectionDrag(t);
     }), document.addEventListener("mouseup", (t) => {
@@ -1918,22 +1938,22 @@ class Y extends I {
   }
 }
 export {
-  B as ClipboardManager,
+  X as ClipboardManager,
   N as Connection,
   R as ContextMenuManager,
   I as EventEmitter,
   D as GridManager,
   A as Group,
   P as Node,
-  Y as NodeGraph,
+  k as NodeGraph,
   $ as SelectionManager,
   L as Slot,
   C as SlotOrientation,
   w as SlotShape,
   T as ViewportManager,
   M as calculateBezierPath,
-  X as debounce,
-  k as getBezierMidpoint,
+  B as debounce,
+  Y as getBezierMidpoint,
   z as throttle,
   x as uid
 };

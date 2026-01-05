@@ -416,8 +416,9 @@
 }
 
 .ng-connection--selected {
-  stroke: #ff6b6b;
+  stroke: #ff0000 !important;
   stroke-width: 3;
+  filter: drop-shadow(0 0 2px rgba(255, 0, 0, 0.5));
 }
 
 .ng-connection--temp {

@@ -213,6 +213,18 @@ export class Slot {
     }
 
     /**
+     * Highlight the slot
+     * @param {boolean} active - Active state
+     */
+    highlight(active) {
+        if (active) {
+            this.connectorElement.classList.add('ng-slot-connector--highlight');
+        } else {
+            this.connectorElement.classList.remove('ng-slot-connector--highlight');
+        }
+    }
+
+    /**
      * Set slot color
      * @param {string} color - CSS color
      */

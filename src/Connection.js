@@ -62,9 +62,32 @@ export class Connection {
      * Bind event listeners
      */
     _bindEvents() {
+        // Dashed (symbolic) connections are non-interactive
+        if (this.style.dashed) {
+            this.pathElement.style.pointerEvents = 'none';
+            return;
+        }
+
         this.pathElement.addEventListener('click', (e) => {
             e.stopPropagation();
-            this.select();
+            // Delegate to selection manager
+            if (this.outputSlot.node.graph) {
+                this.outputSlot.node.graph.selection.selectConnection(this, e.ctrlKey || e.metaKey);
+            }
+        });
+
+        this.pathElement.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            // Select if not already selected
+            if (this.outputSlot.node.graph && !this.selected) {
+                this.outputSlot.node.graph.selection.selectConnection(this);
+            }
+
+            this.pathElement.dispatchEvent(new CustomEvent('connection:contextmenu', {
+                bubbles: true,
+                detail: { connection: this, event: e }
+            }));
         });
 
         this.pathElement.addEventListener('mouseenter', () => {

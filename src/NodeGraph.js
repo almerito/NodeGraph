@@ -193,6 +193,12 @@ export class NodeGraph extends EventEmitter {
             this.contextMenu.open('group', event.clientX, event.clientY, { group });
         });
 
+        // Connection context menu
+        this.connectionsGroup.addEventListener('connection:contextmenu', (e) => {
+            const { connection, event } = e.detail;
+            this.contextMenu.open('connection', event.clientX, event.clientY, { connection });
+        });
+
         // Mouse move for connection dragging and tracking position
         document.addEventListener('mousemove', (e) => {
             // Track last mouse position
