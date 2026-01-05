@@ -616,6 +616,220 @@ export class NodeGraph extends EventEmitter {
     }
 
     /**
+     * Auto-arrange nodes using Island Component Packing (16:9 Aspect Ratio)
+     */
+    arrange() {
+        const allNodes = Array.from(this.nodes.values());
+        if (allNodes.length === 0) return;
+
+        // Settings
+        const xSpacing = 250;
+        const ySpacing = 120;
+        const groupPadding = 80; // Padding between islands
+        const startX = 100;
+        const startY = 100;
+
+        // 1. Identify Connected Components (Islands)
+        const visited = new Set();
+        const islands = [];
+
+        allNodes.forEach(node => {
+            if (visited.has(node.id)) return;
+
+            // Start new island
+            const islandNodes = [];
+            const queue = [node];
+            visited.add(node.id);
+            islandNodes.push(node);
+
+            // Traverse connected component (Undirected logic for gathering)
+            let head = 0;
+            while (head < queue.length) {
+                const current = queue[head++];
+
+                // Check all connections (in and out) to find neighbors
+                const neighbors = new Set();
+                current.inputSlots.forEach(s => s.connections.forEach(c => c.outputSlot.node && neighbors.add(c.outputSlot.node)));
+                current.outputSlots.forEach(s => s.connections.forEach(c => c.inputSlot.node && neighbors.add(c.inputSlot.node)));
+
+                neighbors.forEach(neighbor => {
+                    if (!visited.has(neighbor.id)) {
+                        visited.add(neighbor.id);
+                        islandNodes.push(neighbor);
+                        queue.push(neighbor);
+                    }
+                });
+            }
+
+            islands.push(this._layoutIsland(islandNodes, xSpacing, ySpacing));
+        });
+
+        // 2. Bin Packing Islands into 16:9 Aspect Ratio
+        // Calculate Total Area to estimate target width
+        let totalArea = 0;
+        islands.forEach(island => {
+            totalArea += (island.width + groupPadding) * (island.height + groupPadding);
+        });
+
+        const targetRatio = 16 / 9;
+        // Width * Height = Area, Width / Height = Ratio => Width^2 / Ratio = Area => Width = sqrt(Area * Ratio)
+        const targetWidth = Math.max(1000, Math.sqrt(totalArea * targetRatio));
+
+        // Shelf Packing Algorithm
+        let currentX = 0;
+        let currentY = 0;
+        let rowHeight = 0;
+
+        // Sort islands? Maybe by height to pack better? 
+        // Or keep them in original order to preserve "creation time" clustering? 
+        // Let's sort by height desc for better packing
+        islands.sort((a, b) => b.height - a.height);
+
+        islands.forEach(island => {
+            // Check if fits in current row
+            if (currentX + island.width > targetWidth && currentX > 0) {
+                // New Row
+                currentX = 0;
+                currentY += rowHeight + groupPadding;
+                rowHeight = 0;
+            }
+
+            // Place Island
+            const islandOffsetX = startX + currentX;
+            const islandOffsetY = startY + currentY;
+
+            // Apply positions to nodes in this island
+            island.placements.forEach(p => {
+                p.node.moveTo(islandOffsetX + p.x, islandOffsetY + p.y);
+            });
+
+            // Advance cursor
+            currentX += island.width + groupPadding;
+            rowHeight = Math.max(rowHeight, island.height);
+        });
+
+        this.emit('graph:arrange');
+    }
+
+    /**
+     * Helper to layout a single connected component (Island)
+     * Returns { width, height, placements: [{node, x, y}] }
+     */
+    _layoutIsland(nodes, xSpacing, ySpacing) {
+        if (nodes.length === 0) return { width: 0, height: 0, placements: [] };
+
+        // 1. Calculate Ranks (Topological Sort / Layering within Island)
+        const ranks = new Map();
+        const roots = nodes.filter(node => {
+            // Root if no inputs *from within this island*
+            let hasInternalInput = false;
+            node.inputSlots.forEach(slot => {
+                slot.connections.forEach(conn => {
+                    if (nodes.includes(conn.outputSlot.node)) hasInternalInput = true;
+                });
+            });
+            return !hasInternalInput;
+        });
+
+        if (roots.length === 0) roots.push(nodes[0]); // Handle cycle
+
+        const queue = [];
+        const visitedInIsland = new Set();
+
+        roots.forEach(r => {
+            ranks.set(r.id, 0);
+            queue.push(r);
+            visitedInIsland.add(r.id);
+        });
+
+        while (queue.length > 0) {
+            const node = queue.shift();
+            const currentRank = ranks.get(node.id);
+
+            node.outputSlots.forEach(slot => {
+                slot.connections.forEach(conn => {
+                    const target = conn.inputSlot.node;
+                    // Only process if target is in this island
+                    if (nodes.includes(target)) {
+                        if (!visitedInIsland.has(target.id) || ranks.get(target.id) < currentRank + 1) {
+                            ranks.set(target.id, currentRank + 1);
+                            visitedInIsland.add(target.id);
+                            queue.push(target);
+                        }
+                    }
+                });
+            });
+        }
+
+        // Handle unreachables within island (shouldn't happen if connected, but safe fallback)
+        nodes.forEach(n => {
+            if (!ranks.has(n.id)) ranks.set(n.id, 0);
+        });
+
+        // 2. Group by Rank
+        const layers = [];
+        let maxRank = 0;
+        ranks.forEach((rank, nodeId) => {
+            if (!layers[rank]) layers[rank] = [];
+            layers[rank].push(this.nodes.get(nodeId));
+            if (rank > maxRank) maxRank = rank;
+        });
+
+        // 3. Calculate Positions
+        const placements = [];
+        let islandHeight = 0;
+        const layerWidths = [];
+
+        // Determine max height of the island
+        layers.forEach(layer => {
+            if (!layer) return;
+            // Simple sort by Y to keep relative order or just ID
+            layer.sort((a, b) => a.position.y - b.position.y);
+
+            let layerH = 0;
+            layer.forEach(n => {
+                const b = n.getBounds();
+                layerH += (b.height || 100) + ySpacing;
+            });
+            if (layerH > islandHeight) islandHeight = layerH;
+        });
+        // Remove last spacing pad
+        if (islandHeight > 0) islandHeight -= ySpacing;
+
+        // Position
+        layers.forEach((layer, rank) => {
+            if (!layer) return;
+
+            let currentY = 0;
+            // Center layer vertically relative to island? Or top align?
+            // Top align is safer for now.
+
+            // To Center:
+            // let layerH = ...;
+            // let startY = (islandHeight - layerH) / 2;
+
+            layer.forEach(node => {
+                const b = node.getBounds();
+                const h = b.height || 100;
+
+                placements.push({
+                    node: node,
+                    x: rank * xSpacing,
+                    y: currentY
+                });
+
+                currentY += h + ySpacing;
+            });
+        });
+
+        return {
+            width: (maxRank + 1) * xSpacing, // Approx width
+            height: islandHeight,
+            placements: placements
+        };
+    }
+
+    /**
      * Destroy the graph
      */
     destroy() {

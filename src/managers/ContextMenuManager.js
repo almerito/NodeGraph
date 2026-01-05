@@ -79,6 +79,13 @@ export class ContextMenuManager {
         });
 
         this.addItem('canvas', {
+            id: 'arrange',
+            label: 'Arrange Nodes',
+            icon: '🏗️',
+            action: () => this.graph.arrange()
+        });
+
+        this.addItem('canvas', {
             id: 'reset-view',
             label: 'Reset View',
             icon: '🏠',
