@@ -206,18 +206,11 @@ export class Slot {
      * @returns {object} Position {x, y}
      */
     getConnectionPoint() {
-        const connectorRect = this.connectorElement.getBoundingClientRect();
-        const nodeRect = this.node.element.getBoundingClientRect();
+        const rect = this.connectorElement.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
 
-        // Get position relative to node
-        const relX = connectorRect.left - nodeRect.left + connectorRect.width / 2;
-        const relY = connectorRect.top - nodeRect.top + connectorRect.height / 2;
-
-        // Add node position
-        return {
-            x: this.node.position.x + relX,
-            y: this.node.position.y + relY
-        };
+        return this.node.graph.viewport.screenToGraph(cx, cy);
     }
 
     /**

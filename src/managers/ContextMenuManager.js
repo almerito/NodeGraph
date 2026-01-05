@@ -120,6 +120,32 @@ export class ContextMenuManager {
         this.addItem('node', { type: 'separator' });
 
         this.addItem('node', {
+            id: 'connect',
+            label: 'Connect',
+            icon: '🔗',
+            action: (context) => this.graph.autoConnect(context.node),
+            enabled: (context) => {
+                // Check if any node is close enough
+                const node = context.node;
+                const threshold = Math.min(node.element.offsetWidth, node.element.offsetHeight) / 2;
+                const nodeBounds = node.getBounds();
+
+                for (const other of this.graph.nodes.values()) {
+                    if (other === node) continue;
+                    const otherBounds = other.getBounds();
+                    const dx = Math.max(0, Math.abs((nodeBounds.x + nodeBounds.width / 2) - (otherBounds.x + otherBounds.width / 2)) - (nodeBounds.width + otherBounds.width) / 2);
+                    const dy = Math.max(0, Math.abs((nodeBounds.y + nodeBounds.height / 2) - (otherBounds.y + otherBounds.height / 2)) - (nodeBounds.height + otherBounds.height) / 2);
+                    const gap = Math.sqrt(dx * dx + dy * dy);
+
+                    if (gap < threshold) return true;
+                }
+                return false;
+            }
+        });
+
+        this.addItem('node', { type: 'separator' });
+
+        this.addItem('node', {
             id: 'delete',
             label: 'Delete',
             icon: '🗑️',

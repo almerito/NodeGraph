@@ -666,6 +666,88 @@ export class NodeGraph extends EventEmitter {
     }
 
     /**
+     * Smartly connect this node to nearby compatible nodes
+     * @param {Node} node - The source node
+     * @returns {number} Number of connections made
+     */
+    autoConnect(node) {
+        const threshold = Math.min(node.element.offsetWidth, node.element.offsetHeight) / 2;
+        const nodeBounds = node.getBounds();
+        let connectionsMade = 0;
+
+        this.nodes.forEach(other => {
+            if (other === node) return;
+
+            const otherBounds = other.getBounds();
+
+            // Calculate distance (gap) between boxes
+            // 0 if overlapping
+            const dx = Math.max(0, Math.abs((nodeBounds.x + nodeBounds.width / 2) - (otherBounds.x + otherBounds.width / 2)) - (nodeBounds.width + otherBounds.width) / 2);
+            const dy = Math.max(0, Math.abs((nodeBounds.y + nodeBounds.height / 2) - (otherBounds.y + otherBounds.height / 2)) - (nodeBounds.height + otherBounds.height) / 2);
+            const gap = Math.sqrt(dx * dx + dy * dy);
+
+            // "vicino... a una distanza inferiore alla metà"
+            if (gap < threshold) {
+                // Find best connection
+                // Strategy: Try to connect Output -> Input AND Input -> Output
+                // We want the pair of slots with MINIMUM distance
+
+                let bestPair = null;
+                let minDistance = Infinity;
+
+                // 1. Try Node -> Other (Output -> Input)
+                node.outputSlots.forEach(outSlot => {
+                    other.inputSlots.forEach(inSlot => {
+                        const d = this._getSlotDistance(outSlot, inSlot);
+                        if (d < minDistance) {
+                            minDistance = d;
+                            bestPair = { from: outSlot, to: inSlot };
+                        }
+                    });
+                });
+
+                // 2. Try Other -> Node (Output -> Input)
+                other.outputSlots.forEach(outSlot => {
+                    node.inputSlots.forEach(inSlot => {
+                        const d = this._getSlotDistance(outSlot, inSlot);
+                        if (d < minDistance) {
+                            minDistance = d;
+                            bestPair = { from: outSlot, to: inSlot };
+                        }
+                    });
+                });
+
+                if (bestPair) {
+                    const { from, to } = bestPair;
+
+                    // Handle Replace Logic (only if Input is full)
+                    if (to.connections.size >= to.maxConnections) {
+                        Array.from(to.connections).forEach(c => this.disconnect(c.id));
+                    }
+
+                    // Connect if not already (checked inside connect, but returns null if exists)
+                    if (this.connect(from, to)) {
+                        connectionsMade++;
+                    }
+                }
+            }
+        });
+
+        return connectionsMade;
+    }
+
+    /**
+     * Calculate screen distance between two slots
+     */
+    _getSlotDistance(slotA, slotB) {
+        const pA = slotA.getConnectionPoint();
+        const pB = slotB.getConnectionPoint();
+        const dx = pA.x - pB.x;
+        const dy = pA.y - pB.y;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    /**
      * Auto-arrange nodes using Island Component Packing (16:9 Aspect Ratio)
      */
     arrange() {

@@ -45,21 +45,21 @@ class I {
     this.on(t, s);
   }
 }
-function z(m, t) {
+function z(g, t) {
   let e;
   return function(...s) {
-    e || (m.apply(this, s), e = !0, setTimeout(() => e = !1, t));
+    e || (g.apply(this, s), e = !0, setTimeout(() => e = !1, t));
   };
 }
-function B(m, t) {
+function X(g, t) {
   let e;
   return function(...s) {
-    clearTimeout(e), e = setTimeout(() => m.apply(this, s), t);
+    clearTimeout(e), e = setTimeout(() => g.apply(this, s), t);
   };
 }
-function _(m = "") {
+function _(g = "") {
   const t = Date.now().toString(36), e = Math.random().toString(36).substring(2, 9);
-  return m ? `${m}-${t}-${e}` : `${t}-${e}`;
+  return g ? `${g}-${t}-${e}` : `${t}-${e}`;
 }
 const w = {
   CIRCLE: "circle",
@@ -136,11 +136,8 @@ class L {
    * @returns {object} Position {x, y}
    */
   getConnectionPoint() {
-    const t = this.connectorElement.getBoundingClientRect(), e = this.node.element.getBoundingClientRect(), s = t.left - e.left + t.width / 2, i = t.top - e.top + t.height / 2;
-    return {
-      x: this.node.position.x + s,
-      y: this.node.position.y + i
-    };
+    const t = this.connectorElement.getBoundingClientRect(), e = t.left + t.width / 2, s = t.top + t.height / 2;
+    return this.node.graph.viewport.screenToGraph(e, s);
   }
   /**
    * Highlight the slot
@@ -212,7 +209,7 @@ class L {
     };
   }
 }
-class P {
+class M {
   /**
    * @param {object} config - Node configuration
    * @param {NodeGraph} config.graph - Parent graph
@@ -264,59 +261,59 @@ class P {
   _bindEvents() {
     let t = !1, e = { x: 0, y: 0 };
     const s = /* @__PURE__ */ new Map(), i = (n) => {
-      var h;
+      var r;
       if (n.target.closest(".ng-slot-click-area") || n.target.closest("input") || n.target.closest("button") || n.target.closest("select") || n.target.closest("textarea") || n.button !== 0 || (n.stopPropagation(), this.element.dispatchEvent(new CustomEvent("node:select", {
         bubbles: !0,
         detail: { node: this, event: n }
       })), !this.draggable)) return;
       t = !0, e = { x: n.clientX, y: n.clientY };
-      const l = (h = this.graph) == null ? void 0 : h.selection;
-      s.clear(), l && l.isSelected(this) ? l.getSelectedNodes().forEach((p) => {
+      const h = (r = this.graph) == null ? void 0 : r.selection;
+      s.clear(), h && h.isSelected(this) ? h.getSelectedNodes().forEach((p) => {
         s.set(p, { ...p.position }), p.element.classList.add("ng-node--dragging");
-      }) : (s.set(this, { ...this.position }), this.element.classList.add("ng-node--dragging")), document.addEventListener("mousemove", o), document.addEventListener("mouseup", a);
-    }, o = (n) => {
-      var c, r;
+      }) : (s.set(this, { ...this.position }), this.element.classList.add("ng-node--dragging")), document.addEventListener("mousemove", a), document.addEventListener("mouseup", o);
+    }, a = (n) => {
+      var c, l;
       if (!t) return;
-      const l = ((r = (c = this.graph) == null ? void 0 : c.viewport) == null ? void 0 : r.scale) || 1, h = (n.clientX - e.x) / l, p = (n.clientY - e.y) / l;
-      s.forEach((d, g) => {
-        g.moveTo(d.x + h, d.y + p);
+      const h = ((l = (c = this.graph) == null ? void 0 : c.viewport) == null ? void 0 : l.scale) || 1, r = (n.clientX - e.x) / h, p = (n.clientY - e.y) / h;
+      s.forEach((d, u) => {
+        u.moveTo(d.x + r, d.y + p);
       }), this.element.dispatchEvent(new CustomEvent("node:drag", {
         bubbles: !0,
         detail: { node: this }
       }));
-    }, a = () => {
-      var n, l, h;
+    }, o = () => {
+      var n, h, r;
       if (t) {
         if (t = !1, s.forEach((p, c) => {
           c.element.classList.remove("ng-node--dragging");
-        }), (l = (n = this.graph) == null ? void 0 : n.options) != null && l.snapToGrid) {
-          const p = ((h = this.graph.options.grid) == null ? void 0 : h.step) || 20;
-          s.forEach((c, r) => {
-            r.moveTo(
-              Math.round(r.position.x / p) * p,
-              Math.round(r.position.y / p) * p
+        }), (h = (n = this.graph) == null ? void 0 : n.options) != null && h.snapToGrid) {
+          const p = ((r = this.graph.options.grid) == null ? void 0 : r.step) || 20;
+          s.forEach((c, l) => {
+            l.moveTo(
+              Math.round(l.position.x / p) * p,
+              Math.round(l.position.y / p) * p
             );
           });
         }
         this.element.dispatchEvent(new CustomEvent("node:dragend", {
           bubbles: !0,
           detail: { node: this }
-        })), document.removeEventListener("mousemove", o), document.removeEventListener("mouseup", a), s.clear();
+        })), document.removeEventListener("mousemove", a), document.removeEventListener("mouseup", o), s.clear();
       }
     };
     if (this.element.addEventListener("mousedown", i), this.resizable && this.resizeHandle) {
-      let n = !1, l = { width: 0, height: 0 }, h = { x: 0, y: 0 };
-      this.resizeHandle.addEventListener("mousedown", (r) => {
-        if (r.stopPropagation(), r.button !== 0) return;
-        n = !0, h = { x: r.clientX, y: r.clientY };
+      let n = !1, h = { width: 0, height: 0 }, r = { x: 0, y: 0 };
+      this.resizeHandle.addEventListener("mousedown", (l) => {
+        if (l.stopPropagation(), l.button !== 0) return;
+        n = !0, r = { x: l.clientX, y: l.clientY };
         const d = this.element.getBoundingClientRect();
-        l = { width: d.width, height: d.height }, this.element.style.width = `${d.width}px`, this.element.style.height = `${d.height}px`, this.element.classList.add("ng-node--resizing"), document.addEventListener("mousemove", p), document.addEventListener("mouseup", c);
+        h = { width: d.width, height: d.height }, this.element.style.width = `${d.width}px`, this.element.style.height = `${d.height}px`, this.element.classList.add("ng-node--resizing"), document.addEventListener("mousemove", p), document.addEventListener("mouseup", c);
       });
-      const p = (r) => {
+      const p = (l) => {
         var E, b;
         if (!n) return;
-        const d = ((b = (E = this.graph) == null ? void 0 : E.viewport) == null ? void 0 : b.scale) || 1, g = (r.clientX - h.x) / d, u = (r.clientY - h.y) / d, y = Math.max(100, l.width + g), f = Math.max(50, l.height + u);
-        this.element.style.width = `${y}px`, this.element.style.height = `${f}px`, this._updateConnections();
+        const d = ((b = (E = this.graph) == null ? void 0 : E.viewport) == null ? void 0 : b.scale) || 1, u = (l.clientX - r.x) / d, m = (l.clientY - r.y) / d, f = Math.max(100, h.width + u), y = Math.max(50, h.height + m);
+        this.element.style.width = `${f}px`, this.element.style.height = `${y}px`, this._updateConnections();
       }, c = () => {
         n = !1, this.element.classList.remove("ng-node--resizing"), document.removeEventListener("mousemove", p), document.removeEventListener("mouseup", c);
       };
@@ -536,16 +533,16 @@ class P {
     return "horizontal";
   }
 }
-function A(m, t, e = "horizontal", s = "horizontal") {
-  const i = t.x - m.x, o = t.y - m.y;
-  let a, n, l, h;
-  const p = Math.min(Math.abs(i) / 2, Math.abs(o) / 2, 100), r = Math.max(p, 50);
-  return e === "horizontal" ? (a = m.x + r, n = m.y) : (a = m.x, n = m.y + r), s === "horizontal" ? (l = t.x - r, h = t.y) : (l = t.x, h = t.y - r), `M ${m.x} ${m.y} C ${a} ${n}, ${l} ${h}, ${t.x} ${t.y}`;
+function P(g, t, e = "horizontal", s = "horizontal") {
+  const i = t.x - g.x, a = t.y - g.y;
+  let o, n, h, r;
+  const p = Math.min(Math.abs(i) / 2, Math.abs(a) / 2, 100), l = Math.max(p, 50);
+  return e === "horizontal" ? (o = g.x + l, n = g.y) : (o = g.x, n = g.y + l), s === "horizontal" ? (h = t.x - l, r = t.y) : (h = t.x, r = t.y - l), `M ${g.x} ${g.y} C ${o} ${n}, ${h} ${r}, ${t.x} ${t.y}`;
 }
-function Y(m, t) {
+function G(g, t) {
   return {
-    x: (m.x + t.x) / 2,
-    y: (m.y + t.y) / 2
+    x: (g.x + t.x) / 2,
+    y: (g.y + t.y) / 2
   };
 }
 class N {
@@ -602,8 +599,8 @@ class N {
   * Update the path based on slot positions
   */
   updatePath() {
-    const t = this.outputSlot.getConnectionPoint(), e = this.inputSlot.getConnectionPoint(), s = this.outputSlot.orientation || "horizontal", i = this.inputSlot.orientation || "horizontal", o = A(t, e, s, i);
-    this.pathElement.setAttribute("d", o);
+    const t = this.outputSlot.getConnectionPoint(), e = this.inputSlot.getConnectionPoint(), s = this.outputSlot.orientation || "horizontal", i = this.inputSlot.orientation || "horizontal", a = P(t, e, s, i);
+    this.pathElement.setAttribute("d", a);
   }
   /**
    * Select this connection
@@ -648,7 +645,7 @@ class N {
     };
   }
 }
-class M {
+class A {
   /**
    * @param {object} config - Group configuration
    * @param {NodeGraph} config.graph - Parent graph
@@ -660,8 +657,8 @@ class M {
    * @param {number} config.padding - Padding around nodes
    */
   constructor(t) {
-    var e, s, i, o;
-    this.id = t.id || _("group"), this.graph = t.graph, this.label = t.label || "Group", this.color = t.color || "rgba(102, 126, 234, 0.1)", this.position = { x: ((e = t.position) == null ? void 0 : e.x) || 0, y: ((s = t.position) == null ? void 0 : s.y) || 0 }, this.size = { width: ((i = t.size) == null ? void 0 : i.width) || 200, height: ((o = t.size) == null ? void 0 : o.height) || 150 }, this.padding = t.padding || 20, this.nodes = /* @__PURE__ */ new Set(), this._createElement(), this._bindEvents(), this._updateStyle();
+    var e, s, i, a;
+    this.id = t.id || _("group"), this.graph = t.graph, this.label = t.label || "Group", this.color = t.color || "rgba(102, 126, 234, 0.1)", this.position = { x: ((e = t.position) == null ? void 0 : e.x) || 0, y: ((s = t.position) == null ? void 0 : s.y) || 0 }, this.size = { width: ((i = t.size) == null ? void 0 : i.width) || 200, height: ((a = t.size) == null ? void 0 : a.height) || 150 }, this.padding = t.padding || 20, this.nodes = /* @__PURE__ */ new Set(), this._createElement(), this._bindEvents(), this._updateStyle();
   }
   /**
    * Create the group DOM element
@@ -673,38 +670,38 @@ class M {
    * Bind event listeners
    */
   _bindEvents() {
-    let t = !1, e = !1, s = { x: 0, y: 0 }, i = { x: 0, y: 0 }, o = { width: 0, height: 0 };
-    this.headerElement.addEventListener("mousedown", (a) => {
-      if (a.button !== 0) return;
-      a.stopPropagation(), t = !0, s = { x: a.clientX, y: a.clientY }, i = { ...this.position };
-      const n = [], l = this._getGraphRect();
-      this.graph.nodes.forEach((h) => {
-        const p = h.getBounds();
-        this._rectsIntersect(l, p) && n.push(h);
+    let t = !1, e = !1, s = { x: 0, y: 0 }, i = { x: 0, y: 0 }, a = { width: 0, height: 0 };
+    this.headerElement.addEventListener("mousedown", (o) => {
+      if (o.button !== 0) return;
+      o.stopPropagation(), t = !0, s = { x: o.clientX, y: o.clientY }, i = { ...this.position };
+      const n = [], h = this._getGraphRect();
+      this.graph.nodes.forEach((r) => {
+        const p = r.getBounds();
+        this._rectsIntersect(h, p) && n.push(r);
       }), this.collidingNodes = n, this.element.classList.add("ng-group--dragging");
-    }), this.resizeHandle.addEventListener("mousedown", (a) => {
-      a.button === 0 && (a.stopPropagation(), e = !0, s = { x: a.clientX, y: a.clientY }, o = { ...this.size }, this.element.classList.add("ng-group--resizing"));
-    }), document.addEventListener("mousemove", (a) => {
-      var l, h;
-      const n = ((h = (l = this.graph) == null ? void 0 : l.viewport) == null ? void 0 : h.scale) || 1;
+    }), this.resizeHandle.addEventListener("mousedown", (o) => {
+      o.button === 0 && (o.stopPropagation(), e = !0, s = { x: o.clientX, y: o.clientY }, a = { ...this.size }, this.element.classList.add("ng-group--resizing"));
+    }), document.addEventListener("mousemove", (o) => {
+      var h, r;
+      const n = ((r = (h = this.graph) == null ? void 0 : h.viewport) == null ? void 0 : r.scale) || 1;
       if (t) {
-        const p = (a.clientX - s.x) / n, c = (a.clientY - s.y) / n;
-        this.position.x = i.x + p, this.position.y = i.y + c, this._updatePosition(), this.collidingNodes && (this.collidingNodes.forEach((r) => {
-          r.moveBy(p - (this.lastDx || 0), c - (this.lastDy || 0));
+        const p = (o.clientX - s.x) / n, c = (o.clientY - s.y) / n;
+        this.position.x = i.x + p, this.position.y = i.y + c, this._updatePosition(), this.collidingNodes && (this.collidingNodes.forEach((l) => {
+          l.moveBy(p - (this.lastDx || 0), c - (this.lastDy || 0));
         }), this.lastDx = p, this.lastDy = c);
       }
       if (e) {
-        const p = (a.clientX - s.x) / n, c = (a.clientY - s.y) / n;
-        this.size.width = Math.max(100, o.width + p), this.size.height = Math.max(60, o.height + c), this._updateSize(), o = { ...this.size }, s = { x: a.clientX, y: a.clientY };
+        const p = (o.clientX - s.x) / n, c = (o.clientY - s.y) / n;
+        this.size.width = Math.max(100, a.width + p), this.size.height = Math.max(60, a.height + c), this._updateSize(), a = { ...this.size }, s = { x: o.clientX, y: o.clientY };
       }
     }), document.addEventListener("mouseup", () => {
       t && (t = !1, this.element.classList.remove("ng-group--dragging"), this.collidingNodes = null, this.lastDx = 0, this.lastDy = 0), e && (e = !1, this.element.classList.remove("ng-group--resizing"));
-    }), this.labelElement.addEventListener("dblclick", (a) => {
-      a.stopPropagation(), this._startEditLabel();
-    }), this.element.addEventListener("contextmenu", (a) => {
-      a.preventDefault(), a.stopPropagation(), this.element.dispatchEvent(new CustomEvent("group:contextmenu", {
+    }), this.labelElement.addEventListener("dblclick", (o) => {
+      o.stopPropagation(), this._startEditLabel();
+    }), this.element.addEventListener("contextmenu", (o) => {
+      o.preventDefault(), o.stopPropagation(), this.element.dispatchEvent(new CustomEvent("group:contextmenu", {
         bubbles: !0,
-        detail: { group: this, event: a }
+        detail: { group: this, event: o }
       }));
     });
   }
@@ -719,8 +716,8 @@ class M {
     e.removeAllRanges(), e.addRange(t);
     const s = () => {
       this.labelElement.contentEditable = !1, this.label = this.labelElement.textContent || "Group", this.labelElement.removeEventListener("blur", s), this.labelElement.removeEventListener("keydown", i);
-    }, i = (o) => {
-      o.key === "Enter" && (o.preventDefault(), s()), o.key === "Escape" && (this.labelElement.textContent = this.label, s());
+    }, i = (a) => {
+      a.key === "Enter" && (a.preventDefault(), s()), a.key === "Escape" && (this.labelElement.textContent = this.label, s());
     };
     this.labelElement.addEventListener("blur", s), this.labelElement.addEventListener("keydown", i);
   }
@@ -776,9 +773,9 @@ class M {
   fitToNodes() {
     if (this.nodes.size === 0) return;
     let t = 1 / 0, e = 1 / 0, s = -1 / 0, i = -1 / 0;
-    this.nodes.forEach((o) => {
-      const a = o.getBounds();
-      t = Math.min(t, a.x), e = Math.min(e, a.y), s = Math.max(s, a.x + a.width), i = Math.max(i, a.y + a.height);
+    this.nodes.forEach((a) => {
+      const o = a.getBounds();
+      t = Math.min(t, o.x), e = Math.min(e, o.y), s = Math.max(s, o.x + o.width), i = Math.max(i, o.y + o.height);
     }), this.position.x = t - this.padding, this.position.y = e - this.padding - 30, this.size.width = s - t + this.padding * 2, this.size.height = i - e + this.padding * 2 + 30, this._updatePosition(), this._updateSize();
   }
   /**
@@ -798,8 +795,8 @@ class M {
    * Check if two rects intersect
    */
   _rectsIntersect(t, e) {
-    const s = t.left + t.width, i = t.top + t.height, o = e.x + e.width, a = e.y + e.height;
-    return !(t.left > o || s < e.x || t.top > a || i < e.y);
+    const s = t.left + t.width, i = t.top + t.height, a = e.x + e.width, o = e.y + e.height;
+    return !(t.left > a || s < e.x || t.top > o || i < e.y);
   }
   /**
    * Destroy the group
@@ -832,12 +829,12 @@ class T {
    * @param {object} config.options - Zoom/pan options
    */
   constructor(t) {
-    var e, s, i, o;
+    var e, s, i, a;
     this.container = t.container, this.content = t.content, this.options = {
       minZoom: ((e = t.options) == null ? void 0 : e.minZoom) || 0.1,
       maxZoom: ((s = t.options) == null ? void 0 : s.maxZoom) || 4,
       zoomSpeed: ((i = t.options) == null ? void 0 : i.zoomSpeed) || 0.1,
-      panButton: ((o = t.options) == null ? void 0 : o.panButton) || 1,
+      panButton: ((a = t.options) == null ? void 0 : a.panButton) || 1,
       // Middle mouse button
       ...t.options
     }, this.scale = 1, this.panX = 0, this.panY = 0, this._isPanning = !1, this._panStartX = 0, this._panStartY = 0, this._spacePressed = !1, this._bindEvents();
@@ -854,8 +851,8 @@ class T {
   _bindEvents() {
     this.container.addEventListener("wheel", (t) => {
       t.preventDefault();
-      const e = this.container.getBoundingClientRect(), s = t.clientX - e.left, i = t.clientY - e.top, a = 1 + (t.deltaY > 0 ? -1 : 1) * this.options.zoomSpeed;
-      this.zoomAt(s, i, a);
+      const e = this.container.getBoundingClientRect(), s = t.clientX - e.left, i = t.clientY - e.top, o = 1 + (t.deltaY > 0 ? -1 : 1) * this.options.zoomSpeed;
+      this.zoomAt(s, i, o);
     }, { passive: !1 }), this.container.addEventListener("mousedown", (t) => {
       (t.button === this.options.panButton || t.button === 0 && this._spacePressed) && (t.preventDefault(), this._startPan(t));
     }), document.addEventListener("mousemove", z((t) => {
@@ -901,8 +898,8 @@ class T {
   zoomAt(t, e, s) {
     const i = Math.min(Math.max(this.scale * s, this.options.minZoom), this.options.maxZoom);
     if (i === this.scale) return;
-    const o = i / this.scale;
-    this.panX = t - (t - this.panX) * o, this.panY = e - (e - this.panY) * o, this.scale = i, this._applyTransform();
+    const a = i / this.scale;
+    this.panX = t - (t - this.panX) * a, this.panY = e - (e - this.panY) * a, this.scale = i, this._applyTransform();
   }
   /**
    * Set zoom level
@@ -979,7 +976,7 @@ class T {
     t.scale !== void 0 && (this.scale = t.scale), t.panX !== void 0 && (this.panX = t.panX), t.panY !== void 0 && (this.panY = t.panY), this._applyTransform();
   }
 }
-class $ {
+class D {
   /**
    * @param {NodeGraph} graph - Parent graph
    */
@@ -1011,8 +1008,8 @@ class $ {
    * Update box selection
    */
   _updateBoxSelection(t) {
-    const e = this.graph.viewport.screenToGraph(t.clientX, t.clientY), s = Math.min(this._boxStart.x, e.x), i = Math.min(this._boxStart.y, e.y), o = Math.abs(e.x - this._boxStart.x), a = Math.abs(e.y - this._boxStart.y);
-    this._boxElement.style.left = `${s}px`, this._boxElement.style.top = `${i}px`, this._boxElement.style.width = `${o}px`, this._boxElement.style.height = `${a}px`;
+    const e = this.graph.viewport.screenToGraph(t.clientX, t.clientY), s = Math.min(this._boxStart.x, e.x), i = Math.min(this._boxStart.y, e.y), a = Math.abs(e.x - this._boxStart.x), o = Math.abs(e.y - this._boxStart.y);
+    this._boxElement.style.left = `${s}px`, this._boxElement.style.top = `${i}px`, this._boxElement.style.width = `${a}px`, this._boxElement.style.height = `${o}px`;
   }
   /**
    * End box selection
@@ -1124,20 +1121,20 @@ class $ {
     return this.selectedNodes.has(t);
   }
 }
-class D {
+class $ {
   /**
    * @param {object} config - Configuration
    * @param {SVGElement} config.svgLayer - SVG layer to draw on
    * @param {object} config.options - Grid options
    */
   constructor(t) {
-    var e, s, i, o, a;
+    var e, s, i, a, o;
     this.svgLayer = t.svgLayer, this.options = {
       enabled: ((e = t.options) == null ? void 0 : e.enabled) !== !1,
       step: ((s = t.options) == null ? void 0 : s.step) || 20,
       color: ((i = t.options) == null ? void 0 : i.color) || "rgba(255,255,255,0.05)",
-      majorLineEvery: ((o = t.options) == null ? void 0 : o.majorLineEvery) || 5,
-      majorColor: ((a = t.options) == null ? void 0 : a.majorColor) || "rgba(255,255,255,0.1)",
+      majorLineEvery: ((a = t.options) == null ? void 0 : a.majorLineEvery) || 5,
+      majorColor: ((o = t.options) == null ? void 0 : o.majorColor) || "rgba(255,255,255,0.1)",
       ...t.options
     }, this._gridGroup = null, this._pattern = null, this.options.enabled && this._createGrid();
   }
@@ -1149,11 +1146,11 @@ class D {
     t || (t = document.createElementNS("http://www.w3.org/2000/svg", "defs"), this.svgLayer.insertBefore(t, this.svgLayer.firstChild));
     const e = this.options.step, s = e * this.options.majorLineEvery;
     this._pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern"), this._pattern.setAttribute("id", "ng-grid-pattern"), this._pattern.setAttribute("width", s), this._pattern.setAttribute("height", s), this._pattern.setAttribute("patternUnits", "userSpaceOnUse");
-    for (let o = 0; o <= this.options.majorLineEvery; o++) {
-      const a = o * e, n = o * e, l = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      l.setAttribute("x1", a), l.setAttribute("y1", 0), l.setAttribute("x2", a), l.setAttribute("y2", s), l.setAttribute("stroke", o === 0 ? this.options.majorColor : this.options.color), l.setAttribute("stroke-width", o === 0 ? 1 : 0.5), this._pattern.appendChild(l);
-      const h = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      h.setAttribute("x1", 0), h.setAttribute("y1", n), h.setAttribute("x2", s), h.setAttribute("y2", n), h.setAttribute("stroke", o === 0 ? this.options.majorColor : this.options.color), h.setAttribute("stroke-width", o === 0 ? 1 : 0.5), this._pattern.appendChild(h);
+    for (let a = 0; a <= this.options.majorLineEvery; a++) {
+      const o = a * e, n = a * e, h = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      h.setAttribute("x1", o), h.setAttribute("y1", 0), h.setAttribute("x2", o), h.setAttribute("y2", s), h.setAttribute("stroke", a === 0 ? this.options.majorColor : this.options.color), h.setAttribute("stroke-width", a === 0 ? 1 : 0.5), this._pattern.appendChild(h);
+      const r = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      r.setAttribute("x1", 0), r.setAttribute("y1", n), r.setAttribute("x2", s), r.setAttribute("y2", n), r.setAttribute("stroke", a === 0 ? this.options.majorColor : this.options.color), r.setAttribute("stroke-width", a === 0 ? 1 : 0.5), this._pattern.appendChild(r);
     }
     t.appendChild(this._pattern), this._gridGroup = document.createElementNS("http://www.w3.org/2000/svg", "g"), this._gridGroup.classList.add("ng-grid");
     const i = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -1210,7 +1207,7 @@ class D {
     this._destroyGrid();
   }
 }
-class R {
+class B {
   /**
    * @param {NodeGraph} graph - Parent graph
    */
@@ -1315,6 +1312,20 @@ class R {
         return (t = this.graph.clipboard) == null ? void 0 : t.duplicate();
       }
     }), this.addItem("node", { type: "separator" }), this.addItem("node", {
+      id: "connect",
+      label: "Connect",
+      icon: "🔗",
+      action: (t) => this.graph.autoConnect(t.node),
+      enabled: (t) => {
+        const e = t.node, s = Math.min(e.element.offsetWidth, e.element.offsetHeight) / 2, i = e.getBounds();
+        for (const a of this.graph.nodes.values()) {
+          if (a === e) continue;
+          const o = a.getBounds(), n = Math.max(0, Math.abs(i.x + i.width / 2 - (o.x + o.width / 2)) - (i.width + o.width) / 2), h = Math.max(0, Math.abs(i.y + i.height / 2 - (o.y + o.height / 2)) - (i.height + o.height) / 2);
+          if (Math.sqrt(n * n + h * h) < s) return !0;
+        }
+        return !1;
+      }
+    }), this.addItem("node", { type: "separator" }), this.addItem("node", {
       id: "delete",
       label: "Delete",
       icon: "🗑️",
@@ -1336,8 +1347,8 @@ class R {
       action: (t) => {
         const e = document.createElement("input");
         e.type = "color", e.value = "#667eea", e.style.position = "absolute", e.style.opacity = "0", e.style.pointerEvents = "none", document.body.appendChild(e), e.addEventListener("input", (s) => {
-          const i = s.target.value, o = parseInt(i.slice(1, 3), 16), a = parseInt(i.slice(3, 5), 16), n = parseInt(i.slice(5, 7), 16);
-          t.group.setColor(`rgba(${o}, ${a}, ${n}, 0.1)`);
+          const i = s.target.value, a = parseInt(i.slice(1, 3), 16), o = parseInt(i.slice(3, 5), 16), n = parseInt(i.slice(5, 7), 16);
+          t.group.setColor(`rgba(${a}, ${o}, ${n}, 0.1)`);
         }), e.addEventListener("change", () => {
           e.remove();
         }), e.click();
@@ -1403,30 +1414,30 @@ class R {
    */
   open(t, e, s, i = {}) {
     this.close();
-    const o = this.menuItems[t];
-    if (!o || o.length === 0) return;
-    this.menuElement = document.createElement("div"), this.menuElement.className = "ng-context-menu", o.forEach((n) => {
+    const a = this.menuItems[t];
+    if (!a || a.length === 0) return;
+    this.menuElement = document.createElement("div"), this.menuElement.className = "ng-context-menu", a.forEach((n) => {
       if (n.type === "separator") {
         const c = document.createElement("div");
         c.className = "ng-context-menu-separator", this.menuElement.appendChild(c);
         return;
       }
-      const l = n.enabled ? n.enabled(i) : !0, h = document.createElement("div");
-      if (h.className = "ng-context-menu-item", n.className && h.classList.add(n.className), l || h.classList.add("ng-context-menu-item--disabled"), n.icon) {
+      const h = n.enabled ? n.enabled(i) : !0, r = document.createElement("div");
+      if (r.className = "ng-context-menu-item", n.className && r.classList.add(n.className), h || r.classList.add("ng-context-menu-item--disabled"), n.icon) {
         const c = document.createElement("span");
-        c.className = "ng-context-menu-icon", c.textContent = n.icon, h.appendChild(c);
+        c.className = "ng-context-menu-icon", c.textContent = n.icon, r.appendChild(c);
       }
       const p = document.createElement("span");
-      if (p.className = "ng-context-menu-label", p.textContent = n.label, h.appendChild(p), n.shortcut) {
+      if (p.className = "ng-context-menu-label", p.textContent = n.label, r.appendChild(p), n.shortcut) {
         const c = document.createElement("span");
-        c.className = "ng-context-menu-shortcut", c.textContent = n.shortcut, h.appendChild(c);
+        c.className = "ng-context-menu-shortcut", c.textContent = n.shortcut, r.appendChild(c);
       }
-      l && n.action && h.addEventListener("click", (c) => {
+      h && n.action && r.addEventListener("click", (c) => {
         c.stopPropagation(), n.action(i), this.close();
-      }), this.menuElement.appendChild(h);
+      }), this.menuElement.appendChild(r);
     }), this.menuElement.style.left = `${e}px`, this.menuElement.style.top = `${s}px`, document.body.appendChild(this.menuElement), this.isOpen = !0;
-    const a = this.menuElement.getBoundingClientRect();
-    a.right > window.innerWidth && (this.menuElement.style.left = `${e - a.width}px`), a.bottom > window.innerHeight && (this.menuElement.style.top = `${s - a.height}px`);
+    const o = this.menuElement.getBoundingClientRect();
+    o.right > window.innerWidth && (this.menuElement.style.left = `${e - o.width}px`), o.bottom > window.innerHeight && (this.menuElement.style.top = `${s - o.height}px`);
   }
   /**
    * Close context menu
@@ -1441,7 +1452,7 @@ class R {
     this.close();
   }
 }
-class X {
+class R {
   /**
    * @param {NodeGraph} graph - Parent graph
    */
@@ -1467,18 +1478,18 @@ class X {
     const t = ((n = this.graph.selection) == null ? void 0 : n.getSelectedNodes()) || [];
     if (t.length === 0) return;
     let e = 1 / 0, s = 1 / 0;
-    t.forEach((l) => {
-      e = Math.min(e, l.position.x), s = Math.min(s, l.position.y);
+    t.forEach((h) => {
+      e = Math.min(e, h.position.x), s = Math.min(s, h.position.y);
     });
-    const i = t.map((l) => {
-      const h = l.serialize();
-      return h.position.x -= e, h.position.y -= s, h;
-    }), o = new Set(t.map((l) => l.id)), a = [];
-    this.graph.connections.forEach((l) => {
-      o.has(l.outputSlot.node.id) && o.has(l.inputSlot.node.id) && a.push(l.serialize());
+    const i = t.map((h) => {
+      const r = h.serialize();
+      return r.position.x -= e, r.position.y -= s, r;
+    }), a = new Set(t.map((h) => h.id)), o = [];
+    this.graph.connections.forEach((h) => {
+      a.has(h.outputSlot.node.id) && a.has(h.inputSlot.node.id) && o.push(h.serialize());
     }), this._clipboardData = {
       nodes: i,
-      connections: a
+      connections: o
     }, this.graph.emit("clipboard:copy", { nodes: t });
   }
   /**
@@ -1492,22 +1503,22 @@ class X {
   * Paste nodes from clipboard
   */
   paste() {
-    var o, a;
+    var a, o;
     if (!this._clipboardData) return;
     let t, e;
     if (this.graph.lastMousePos) {
       const n = this.graph.viewport.screenToGraph(this.graph.lastMousePos.x, this.graph.lastMousePos.y);
       t = n.x, e = n.y;
     } else {
-      const n = ((o = this.graph.viewport) == null ? void 0 : o.getState()) || { panX: 0, panY: 0, scale: 1 }, l = this.graph.container.getBoundingClientRect();
-      t = (l.width / 2 - n.panX) / n.scale, e = (l.height / 2 - n.panY) / n.scale;
+      const n = ((a = this.graph.viewport) == null ? void 0 : a.getState()) || { panX: 0, panY: 0, scale: 1 }, h = this.graph.container.getBoundingClientRect();
+      t = (h.width / 2 - n.panX) / n.scale, e = (h.height / 2 - n.panY) / n.scale;
     }
     const s = /* @__PURE__ */ new Map();
-    (a = this.graph.selection) == null || a.clearSelection();
+    (o = this.graph.selection) == null || o.clearSelection();
     const i = [];
     this._clipboardData.nodes.forEach((n) => {
       var p;
-      const l = n.id, h = this.graph.addNode({
+      const h = n.id, r = this.graph.addNode({
         ...n,
         id: void 0,
         // Let it generate new ID
@@ -1516,14 +1527,14 @@ class X {
           y: e + n.position.y
         }
       });
-      s.set(l, h.id), i.push(h), (p = this.graph.selection) == null || p.addToSelection(h);
+      s.set(h, r.id), i.push(r), (p = this.graph.selection) == null || p.addToSelection(r);
     }), this._clipboardData.connections.forEach((n) => {
-      const l = s.get(n.outputNodeId), h = s.get(n.inputNodeId);
-      if (l && h) {
-        const p = this.graph.getNode(l), c = this.graph.getNode(h);
+      const h = s.get(n.outputNodeId), r = s.get(n.inputNodeId);
+      if (h && r) {
+        const p = this.graph.getNode(h), c = this.graph.getNode(r);
         if (p && c) {
-          const r = p.getOutput(n.outputSlotId), d = c.getInput(n.inputSlotId);
-          r && d && this.graph.connect(r, d, n.style);
+          const l = p.getOutput(n.outputSlotId), d = c.getInput(n.inputSlotId);
+          l && d && this.graph.connect(l, d, n.style);
         }
       }
     }), this.graph.emit("clipboard:paste", { nodes: i });
@@ -1589,10 +1600,10 @@ class k extends I {
       container: this.container,
       content: this.viewportElement,
       options: this.options.zoom
-    }), this.selection = new $(this), this.grid = new D({
+    }), this.selection = new D(this), this.grid = new $({
       svgLayer: this.svgLayer,
       options: this.options.grid
-    }), this.contextMenu = new R(this), this.clipboard = new X(this);
+    }), this.contextMenu = new B(this), this.clipboard = new R(this);
   }
   /**
    * Bind global event listeners
@@ -1644,25 +1655,25 @@ class k extends I {
    */
   _updateConnectionDrag(t) {
     if (!this._connectionDrag || !this._tempPath) return;
-    const e = this.viewport.screenToGraph(t.clientX, t.clientY), s = this._connectionDrag.startPos, i = this._connectionDrag.sourceSlot.orientation, o = e.x - s.x, a = Math.max(Math.abs(o) / 2, 50);
+    const e = this.viewport.screenToGraph(t.clientX, t.clientY), s = this._connectionDrag.startPos, i = this._connectionDrag.sourceSlot.orientation, a = e.x - s.x, o = Math.max(Math.abs(a) / 2, 50);
     let n;
-    i === "horizontal" ? n = `M ${s.x} ${s.y} C ${s.x + a} ${s.y}, ${e.x - a} ${e.y}, ${e.x} ${e.y}` : n = `M ${s.x} ${s.y} C ${s.x} ${s.y + a}, ${e.x} ${e.y - a}, ${e.x} ${e.y}`, this._tempPath.setAttribute("d", n);
-    const l = document.elementFromPoint(t.clientX, t.clientY), h = l == null ? void 0 : l.closest(".ng-slot-click-area"), p = h == null ? void 0 : h.closest(".ng-slot");
+    i === "horizontal" ? n = `M ${s.x} ${s.y} C ${s.x + o} ${s.y}, ${e.x - o} ${e.y}, ${e.x} ${e.y}` : n = `M ${s.x} ${s.y} C ${s.x} ${s.y + o}, ${e.x} ${e.y - o}, ${e.x} ${e.y}`, this._tempPath.setAttribute("d", n);
+    const h = document.elementFromPoint(t.clientX, t.clientY), r = h == null ? void 0 : h.closest(".ng-slot-click-area"), p = r == null ? void 0 : r.closest(".ng-slot");
     let c = null;
     if (p) {
       const d = p.closest(".ng-node");
       if (d) {
-        const g = d.dataset.nodeId, u = this.nodes.get(g);
-        if (u) {
-          const y = p.dataset.slotId, f = p.dataset.slotType;
-          f === "input" ? c = u.inputSlots.get(y) : f === "output" ? c = u.outputSlots.get(y) : c = u.inputSlots.get(y) || u.outputSlots.get(y);
+        const u = d.dataset.nodeId, m = this.nodes.get(u);
+        if (m) {
+          const f = p.dataset.slotId, y = p.dataset.slotType;
+          y === "input" ? c = m.inputSlots.get(f) : y === "output" ? c = m.outputSlots.get(f) : c = m.inputSlots.get(f) || m.outputSlots.get(f);
         }
       }
     }
-    const r = this._connectionDrag.targetSlot;
-    if (c !== r) {
-      if (r) {
-        const d = r.element.querySelector(".ng-slot-connector");
+    const l = this._connectionDrag.targetSlot;
+    if (c !== l) {
+      if (l) {
+        const d = l.element.querySelector(".ng-slot-connector");
         d && d.classList.remove("ng-slot-connector--invalid", "ng-slot-connector--highlight");
       }
       if (c)
@@ -1677,8 +1688,8 @@ class k extends I {
             // Assume valid initially
           };
           (c.node === this._connectionDrag.sourceSlot.node || c.type === this._connectionDrag.sourceSlot.type) && (d.valid = !1), this.emit("connection:validate", d), this._connectionDrag.isValid = d.valid;
-          const g = c.element.querySelector(".ng-slot-connector");
-          g && (d.valid ? g.classList.add("ng-slot-connector--highlight") : g.classList.add("ng-slot-connector--invalid"));
+          const u = c.element.querySelector(".ng-slot-connector");
+          u && (d.valid ? u.classList.add("ng-slot-connector--highlight") : u.classList.add("ng-slot-connector--invalid"));
         }
       this._connectionDrag.targetSlot = c;
     }
@@ -1695,19 +1706,19 @@ class k extends I {
     }
     if (e && this._connectionDrag.isValid) {
       const s = this._connectionDrag.sourceSlot;
-      let i, o;
-      if (s.type === "output" && e.type === "input" ? (i = s, o = e) : s.type === "input" && e.type === "output" && (i = e, o = s), i && o) {
-        if (o.connections.size >= o.maxConnections) {
-          const a = o.connections.size - o.maxConnections + 1, n = Array.from(o.connections);
-          for (let l = 0; l < a; l++)
-            this.disconnect(n[l].id);
+      let i, a;
+      if (s.type === "output" && e.type === "input" ? (i = s, a = e) : s.type === "input" && e.type === "output" && (i = e, a = s), i && a) {
+        if (a.connections.size >= a.maxConnections) {
+          const o = a.connections.size - a.maxConnections + 1, n = Array.from(a.connections);
+          for (let h = 0; h < o; h++)
+            this.disconnect(n[h].id);
         }
         if (i.connections.size >= i.maxConnections) {
-          const a = i.connections.size - i.maxConnections + 1, n = Array.from(i.connections);
-          for (let l = 0; l < a; l++)
-            this.disconnect(n[l].id);
+          const o = i.connections.size - i.maxConnections + 1, n = Array.from(i.connections);
+          for (let h = 0; h < o; h++)
+            this.disconnect(n[h].id);
         }
-        this.connect(i, o);
+        this.connect(i, a);
       }
     }
     this._tempPath && (this._tempPath.remove(), this._tempPath = null), this._connectionDrag = null;
@@ -1730,7 +1741,7 @@ class k extends I {
    * @returns {Node} Created node
    */
   addNode(t) {
-    const e = new P({
+    const e = new M({
       ...t,
       graph: this
     });
@@ -1762,9 +1773,9 @@ class k extends I {
   connect(t, e, s = {}) {
     if (t.type !== "output" || e.type !== "input")
       return console.warn("NodeGraph: Invalid connection - must be output to input"), null;
-    for (const o of this.connections.values())
-      if (o.outputSlot === t && o.inputSlot === e)
-        return o;
+    for (const a of this.connections.values())
+      if (a.outputSlot === t && a.inputSlot === e)
+        return a;
     const i = new N({
       outputSlot: t,
       inputSlot: e,
@@ -1805,7 +1816,7 @@ class k extends I {
    * @returns {Group} Created group
    */
   addGroup(t) {
-    const e = new M({
+    const e = new A({
       ...t,
       graph: this
     });
@@ -1847,16 +1858,53 @@ class k extends I {
     }), t.connections && t.connections.forEach((e) => {
       const s = this.nodes.get(e.outputNodeId), i = this.nodes.get(e.inputNodeId);
       if (s && i) {
-        const o = s.getOutput(e.outputSlotId), a = i.getInput(e.inputSlotId);
-        o && a && this.connect(o, a, e.style);
+        const a = s.getOutput(e.outputSlotId), o = i.getInput(e.inputSlotId);
+        a && o && this.connect(a, o, e.style);
       }
     }), t.groups && t.groups.forEach((e) => {
       const s = this.addGroup(e);
       e.nodeIds && e.nodeIds.forEach((i) => {
-        const o = this.nodes.get(i);
-        o && s.addNode(o);
+        const a = this.nodes.get(i);
+        a && s.addNode(a);
       });
     }), t.viewport && this.viewport.setState(t.viewport), this.emit("graph:deserialize", t);
+  }
+  /**
+   * Smartly connect this node to nearby compatible nodes
+   * @param {Node} node - The source node
+   * @returns {number} Number of connections made
+   */
+  autoConnect(t) {
+    const e = Math.min(t.element.offsetWidth, t.element.offsetHeight) / 2, s = t.getBounds();
+    let i = 0;
+    return this.nodes.forEach((a) => {
+      if (a === t) return;
+      const o = a.getBounds(), n = Math.max(0, Math.abs(s.x + s.width / 2 - (o.x + o.width / 2)) - (s.width + o.width) / 2), h = Math.max(0, Math.abs(s.y + s.height / 2 - (o.y + o.height / 2)) - (s.height + o.height) / 2);
+      if (Math.sqrt(n * n + h * h) < e) {
+        let p = null, c = 1 / 0;
+        if (t.outputSlots.forEach((l) => {
+          a.inputSlots.forEach((d) => {
+            const u = this._getSlotDistance(l, d);
+            u < c && (c = u, p = { from: l, to: d });
+          });
+        }), a.outputSlots.forEach((l) => {
+          t.inputSlots.forEach((d) => {
+            const u = this._getSlotDistance(l, d);
+            u < c && (c = u, p = { from: l, to: d });
+          });
+        }), p) {
+          const { from: l, to: d } = p;
+          d.connections.size >= d.maxConnections && Array.from(d.connections).forEach((u) => this.disconnect(u.id)), this.connect(l, d) && i++;
+        }
+      }
+    }), i;
+  }
+  /**
+   * Calculate screen distance between two slots
+   */
+  _getSlotDistance(t, e) {
+    const s = t.getConnectionPoint(), i = e.getConnectionPoint(), a = s.x - i.x, o = s.y - i.y;
+    return Math.sqrt(a * a + o * o);
   }
   /**
    * Auto-arrange nodes using Island Component Packing (16:9 Aspect Ratio)
@@ -1864,32 +1912,32 @@ class k extends I {
   arrange() {
     const t = Array.from(this.nodes.values());
     if (t.length === 0) return;
-    const e = 250, s = 120, i = 80, o = 100, a = 100, n = /* @__PURE__ */ new Set(), l = [];
-    t.forEach((u) => {
-      if (n.has(u.id)) return;
-      const y = [], f = [u];
-      n.add(u.id), y.push(u);
+    const e = 250, s = 120, i = 80, a = 100, o = 100, n = /* @__PURE__ */ new Set(), h = [];
+    t.forEach((m) => {
+      if (n.has(m.id)) return;
+      const f = [], y = [m];
+      n.add(m.id), f.push(m);
       let E = 0;
-      for (; E < f.length; ) {
-        const b = f[E++], S = /* @__PURE__ */ new Set();
+      for (; E < y.length; ) {
+        const b = y[E++], S = /* @__PURE__ */ new Set();
         b.inputSlots.forEach((v) => v.connections.forEach((x) => x.outputSlot.node && S.add(x.outputSlot.node))), b.outputSlots.forEach((v) => v.connections.forEach((x) => x.inputSlot.node && S.add(x.inputSlot.node))), S.forEach((v) => {
-          n.has(v.id) || (n.add(v.id), y.push(v), f.push(v));
+          n.has(v.id) || (n.add(v.id), f.push(v), y.push(v));
         });
       }
-      l.push(this._layoutIsland(y, e, s));
+      h.push(this._layoutIsland(f, e, s));
     });
-    let h = 0;
-    l.forEach((u) => {
-      h += (u.width + i) * (u.height + i);
+    let r = 0;
+    h.forEach((m) => {
+      r += (m.width + i) * (m.height + i);
     });
-    const p = 16 / 9, c = Math.max(1e3, Math.sqrt(h * p));
-    let r = 0, d = 0, g = 0;
-    l.sort((u, y) => y.height - u.height), l.forEach((u) => {
-      r + u.width > c && r > 0 && (r = 0, d += g + i, g = 0);
-      const y = o + r, f = a + d;
-      u.placements.forEach((E) => {
-        E.node.moveTo(y + E.x, f + E.y);
-      }), r += u.width + i, g = Math.max(g, u.height);
+    const p = 16 / 9, c = Math.max(1e3, Math.sqrt(r * p));
+    let l = 0, d = 0, u = 0;
+    h.sort((m, f) => f.height - m.height), h.forEach((m) => {
+      l + m.width > c && l > 0 && (l = 0, d += u + i, u = 0);
+      const f = a + l, y = o + d;
+      m.placements.forEach((E) => {
+        E.node.moveTo(f + E.x, y + E.y);
+      }), l += m.width + i, u = Math.max(u, m.height);
     }), this.emit("graph:arrange");
   }
   /**
@@ -1898,58 +1946,58 @@ class k extends I {
    */
   _layoutIsland(t, e, s) {
     if (t.length === 0) return { width: 0, height: 0, placements: [] };
-    const i = /* @__PURE__ */ new Map(), o = t.filter((r) => {
+    const i = /* @__PURE__ */ new Map(), a = t.filter((l) => {
       let d = !1;
-      return r.inputSlots.forEach((g) => {
-        g.connections.forEach((u) => {
-          t.includes(u.outputSlot.node) && (d = !0);
+      return l.inputSlots.forEach((u) => {
+        u.connections.forEach((m) => {
+          t.includes(m.outputSlot.node) && (d = !0);
         });
       }), !d;
     });
-    o.length === 0 && o.push(t[0]);
-    const a = [], n = /* @__PURE__ */ new Set();
-    for (o.forEach((r) => {
-      i.set(r.id, 0), a.push(r), n.add(r.id);
-    }); a.length > 0; ) {
-      const r = a.shift(), d = i.get(r.id);
-      r.outputSlots.forEach((g) => {
-        g.connections.forEach((u) => {
-          const y = u.inputSlot.node;
-          t.includes(y) && (!n.has(y.id) || i.get(y.id) < d + 1) && (i.set(y.id, d + 1), n.add(y.id), a.push(y));
+    a.length === 0 && a.push(t[0]);
+    const o = [], n = /* @__PURE__ */ new Set();
+    for (a.forEach((l) => {
+      i.set(l.id, 0), o.push(l), n.add(l.id);
+    }); o.length > 0; ) {
+      const l = o.shift(), d = i.get(l.id);
+      l.outputSlots.forEach((u) => {
+        u.connections.forEach((m) => {
+          const f = m.inputSlot.node;
+          t.includes(f) && (!n.has(f.id) || i.get(f.id) < d + 1) && (i.set(f.id, d + 1), n.add(f.id), o.push(f));
         });
       });
     }
-    t.forEach((r) => {
-      i.has(r.id) || i.set(r.id, 0);
+    t.forEach((l) => {
+      i.has(l.id) || i.set(l.id, 0);
     });
-    const l = [];
-    let h = 0;
-    i.forEach((r, d) => {
-      l[r] || (l[r] = []), l[r].push(this.nodes.get(d)), r > h && (h = r);
+    const h = [];
+    let r = 0;
+    i.forEach((l, d) => {
+      h[l] || (h[l] = []), h[l].push(this.nodes.get(d)), l > r && (r = l);
     });
     const p = [];
     let c = 0;
-    return l.forEach((r) => {
-      if (!r) return;
-      r.sort((g, u) => g.position.y - u.position.y);
+    return h.forEach((l) => {
+      if (!l) return;
+      l.sort((u, m) => u.position.y - m.position.y);
       let d = 0;
-      r.forEach((g) => {
-        const u = g.getBounds();
-        d += (u.height || 100) + s;
+      l.forEach((u) => {
+        const m = u.getBounds();
+        d += (m.height || 100) + s;
       }), d > c && (c = d);
-    }), c > 0 && (c -= s), l.forEach((r, d) => {
-      if (!r) return;
-      let g = 0;
-      r.forEach((u) => {
-        const f = u.getBounds().height || 100;
+    }), c > 0 && (c -= s), h.forEach((l, d) => {
+      if (!l) return;
+      let u = 0;
+      l.forEach((m) => {
+        const y = m.getBounds().height || 100;
         p.push({
-          node: u,
+          node: m,
           x: d * e,
-          y: g
-        }), g += f + s;
+          y: u
+        }), u += y + s;
       });
     }), {
-      width: (h + 1) * e,
+      width: (r + 1) * e,
       // Approx width
       height: c,
       placements: p
@@ -1964,22 +2012,22 @@ class k extends I {
   }
 }
 export {
-  X as ClipboardManager,
+  R as ClipboardManager,
   N as Connection,
-  R as ContextMenuManager,
+  B as ContextMenuManager,
   I as EventEmitter,
-  D as GridManager,
-  M as Group,
-  P as Node,
+  $ as GridManager,
+  A as Group,
+  M as Node,
   k as NodeGraph,
-  $ as SelectionManager,
+  D as SelectionManager,
   L as Slot,
   C as SlotOrientation,
   w as SlotShape,
   T as ViewportManager,
-  A as calculateBezierPath,
-  B as debounce,
-  Y as getBezierMidpoint,
+  P as calculateBezierPath,
+  X as debounce,
+  G as getBezierMidpoint,
   z as throttle,
   _ as uid
 };
