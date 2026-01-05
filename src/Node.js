@@ -343,6 +343,11 @@ export class Node {
                 this.element.classList.remove('ng-node--resizing');
                 document.removeEventListener('mousemove', onResizeMove);
                 document.removeEventListener('mouseup', onResizeUp);
+
+                this.element.dispatchEvent(new CustomEvent('node:resize', {
+                    bubbles: true,
+                    detail: { node: this }
+                }));
             };
         }
 

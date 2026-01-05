@@ -91,3 +91,45 @@ The library uses CSS variables for slots, which can be overridden globally, per-
 - `.ng-slot-connector`: The visual "dot" or shape.
 - `.ng-slot-label`: Text label.
 - `.ng-connection`: SVG path for connections.
+
+## 6. Events
+The `NodeGraph` instance emits various events that you can listen to using `graph.on(eventName, callback)`.
+
+### Global Change Event
+Triggered for *any* state change in the graph. Useful for auto-saving, history management, or external UI updates.
+- **`change`**: `{ type: string, item: any, timestamp: number }`
+  - `type`: Original event name (e.g., 'node:move', 'node:add')
+  - `item`: Affected object or ID
+
+### Node Events
+- **`node:add`**: `(node: Node)` - Fired when a node is added.
+- **`node:remove`**: `(nodeId: string)` - Fired when a node is removed.
+- **`node:select`**: `(node: Node)` - Fired when a node is selected.
+- **`node:deselect`**: `(node: Node)` - Fired when a node is deselected.
+- **`node:drag`**: `(node: Node)` - Fired while dragging a node.
+- **`node:dragend`** (or `node:move` in change event): `(node: Node)` - Fired when drag ends.
+- **`node:resize`**: `(node: Node)` - Fired when node resizing is completed.
+- **`node:contextmenu`**: `(node: Node)` - Fired when right-clicking a node.
+
+### Connection Events
+- **`connection:create`**: `(connection: Connection)` - Fired when a connection is created.
+- **`connection:remove`**: `(connectionId: string)` - Fired when a connection is removed.
+- **`connection:validate`**: `(context: { source: Slot, target: Slot, valid: boolean })` - Fired during drag to validate potential connection. Modify `context.valid` to prevent connections.
+
+### Group Events
+- **`group:add`**: `(group: Group)` - Fired when a group is added.
+- **`group:remove`**: `(groupId: string)` - Fired when a group is removed.
+
+### Graph & Selection Events
+- **`graph:arrange`**: `()` - Fired after auto-arrange is applied.
+- **`graph:clear`**: `()` - Fired when graph is cleared.
+- **`graph:deserialize`**: `(data: object)` - Fired after graph state is restored.
+- **`selection:change`**: `{ nodes: Node[], connections: Connection[] }` - Fired when selection set changes.
+
+### Clipboard Events
+- **`clipboard:copy`**: `{ nodes: Node[] }`
+- **`clipboard:cut`**: `{}`
+- **`clipboard:paste`**: `{ nodes: Node[] }` (New nodes)
+
+### Canvas Events
+- **`canvas:add-node`**: `(position: {x, y})` - Fired from context menu "Add Node". Listen to this to show your node creation modal/menu.

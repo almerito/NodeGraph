@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ],
         outputs: [
             { id: 'edge_out', label: null, side: 'right', size: 20, edge: true, color: '#f687b3' },
-            { id: 'edge_bottom', label: null, side: 'bottom', size: 20, edge: true, color: '#f6e05e' }
+            { id: 'edge_bottom', label: null, side: 'bottom', size: 20, edge: true, color: '#f6e05e', shape: SlotShape.DIAMOND }
         ]
     });
 
@@ -125,6 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const node8 = graph.addNode({
         id: 'node-custom',
         position: { x: 400, y: 500 },
+        resizable: true,
         header: {
             content: '<strong>Custom Sizes</strong>',
             style: {
@@ -141,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ],
         outputs: [
             { id: 'huge_out', label: 'Huge', size: 24, shape: SlotShape.DIAMOND, color: '#00ffcc' },
-            { id: 'tiny_out', label: 'Tiny', size: 6, side: 'bottom' }
+            { id: 'tiny_out', label: 'Tiny', size: 6, side: 'bottom', shape: SlotShape.DIAMOND }
         ]
     });
 

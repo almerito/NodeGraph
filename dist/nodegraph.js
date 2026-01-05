@@ -315,7 +315,10 @@ class M {
         const d = ((b = (E = this.graph) == null ? void 0 : E.viewport) == null ? void 0 : b.scale) || 1, u = (l.clientX - r.x) / d, m = (l.clientY - r.y) / d, f = Math.max(100, h.width + u), y = Math.max(50, h.height + m);
         this.element.style.width = `${f}px`, this.element.style.height = `${y}px`, this._updateConnections();
       }, c = () => {
-        n = !1, this.element.classList.remove("ng-node--resizing"), document.removeEventListener("mousemove", p), document.removeEventListener("mouseup", c);
+        n = !1, this.element.classList.remove("ng-node--resizing"), document.removeEventListener("mousemove", p), document.removeEventListener("mouseup", c), this.element.dispatchEvent(new CustomEvent("node:resize", {
+          bubbles: !0,
+          detail: { node: this }
+        }));
       };
     }
     this.element.addEventListener("contextmenu", (n) => {
@@ -1611,41 +1614,81 @@ class k extends I {
    * Bind global event listeners
    */
   _bindEvents() {
-    this.nodesLayer.addEventListener("node:select", (t) => {
-      const { node: e, event: s } = t.detail;
-      s.ctrlKey || s.metaKey ? this.selection.toggleSelection(e) : this.selection.isSelected(e) || this.selection.selectNode(e), this.emit("node:select", e);
-    }), this.nodesLayer.addEventListener("node:drag", (t) => {
-      const { node: e } = t.detail;
-      this.selection.isSelected(e) && this.selection.selectedNodes.size > 1, this.emit("node:drag", e);
-    }), this.nodesLayer.addEventListener("node:dragend", (t) => {
-      this.emit("node:dragend", t.detail.node);
-    }), this.nodesLayer.addEventListener("node:contextmenu", (t) => {
-      const { node: e, event: s } = t.detail;
-      this.selection.isSelected(e) || this.selection.selectNode(e), this.contextMenu.open("node", s.clientX, s.clientY, { node: e });
-    }), this.nodesLayer.addEventListener("slot:dragstart", (t) => {
-      const { slot: e, event: s } = t.detail;
-      this._startConnectionDrag(e, s);
-    }), this.container.addEventListener("contextmenu", (t) => {
-      if (t.target === this.container || t.target === this.viewportElement || t.target === this.nodesLayer || t.target.classList.contains("ng-viewport")) {
-        t.preventDefault();
-        const e = this.viewport.screenToGraph(t.clientX, t.clientY);
-        this.contextMenu.open("canvas", t.clientX, t.clientY, { position: e });
+    this.nodesLayer.addEventListener("node:select", (e) => {
+      const { node: s, event: i } = e.detail;
+      i.ctrlKey || i.metaKey ? this.selection.toggleSelection(s) : this.selection.isSelected(s) || this.selection.selectNode(s), this.emit("node:select", s);
+    }), this.nodesLayer.addEventListener("node:drag", (e) => {
+      const { node: s } = e.detail;
+      this.selection.isSelected(s) && this.selection.selectedNodes.size > 1, this.emit("node:drag", s);
+    }), this.nodesLayer.addEventListener("node:dragend", (e) => {
+      this.emit("node:dragend", e.detail.node);
+    }), this.nodesLayer.addEventListener("node:resize", (e) => {
+      this.emit("node:resize", e.detail.node);
+    }), this.nodesLayer.addEventListener("node:contextmenu", (e) => {
+      const { node: s, event: i } = e.detail;
+      this.selection.isSelected(s) || this.selection.selectNode(s), this.contextMenu.open("node", i.clientX, i.clientY, { node: s });
+    }), this.nodesLayer.addEventListener("slot:dragstart", (e) => {
+      const { slot: s, event: i } = e.detail;
+      this._startConnectionDrag(s, i);
+    }), this.container.addEventListener("contextmenu", (e) => {
+      if (e.target === this.container || e.target === this.viewportElement || e.target === this.nodesLayer || e.target.classList.contains("ng-viewport")) {
+        e.preventDefault();
+        const s = this.viewport.screenToGraph(e.clientX, e.clientY);
+        this.contextMenu.open("canvas", e.clientX, e.clientY, { position: s });
       }
-    }), this.groupsLayer.addEventListener("group:contextmenu", (t) => {
-      const { group: e, event: s } = t.detail;
-      this.contextMenu.open("group", s.clientX, s.clientY, { group: e });
-    }), this.connectionsGroup.addEventListener("connection:contextmenu", (t) => {
-      const { connection: e, event: s } = t.detail;
-      this.contextMenu.open("connection", s.clientX, s.clientY, { connection: e });
-    }), document.addEventListener("mousemove", (t) => {
-      this.lastMousePos = { x: t.clientX, y: t.clientY }, this._connectionDrag && this._updateConnectionDrag(t);
-    }), document.addEventListener("mouseup", (t) => {
-      this._connectionDrag && this._endConnectionDrag(t);
+    }), this.groupsLayer.addEventListener("group:contextmenu", (e) => {
+      const { group: s, event: i } = e.detail;
+      this.contextMenu.open("group", i.clientX, i.clientY, { group: s });
+    }), this.connectionsGroup.addEventListener("connection:contextmenu", (e) => {
+      const { connection: s, event: i } = e.detail;
+      this.contextMenu.open("connection", i.clientX, i.clientY, { connection: s });
+    }), document.addEventListener("mousemove", (e) => {
+      this.lastMousePos = { x: e.clientX, y: e.clientY }, this._connectionDrag && this._updateConnectionDrag(e);
+    }), document.addEventListener("mouseup", (e) => {
+      this._connectionDrag && this._endConnectionDrag(e);
+    }), [
+      "node:add",
+      "node:remove",
+      "node:dragend",
+      "node:resize",
+      // Nodes
+      "connection:create",
+      "connection:remove",
+      // Connections
+      "group:add",
+      "group:remove",
+      // Groups
+      "graph:arrange",
+      "graph:clear",
+      // Graph
+      "clipboard:paste",
+      "clipboard:cut",
+      "clipboard:duplicate"
+      // Clipboard (redundant but explicit?)
+      // Note: paste/cut/duplicate already trigger add/remove events, but specific event might be useful.
+      // User requested "change" with details.
+      // If we emit change for 'clipboard:paste', we duplicate events for the nodes added.
+      // User asked: "nuovo nodo aggiunto... duplicato...".
+      // If I duplicate, I get 'node:add'. That satisfies "nuovo nodo aggiunto" AND "duplicato" implicitly.
+      // But maybe explicit is better?
+      // "il tipo di cambiamento e se possibile l'oggetto".
+      // Let's stick to primitive changes for data consistency, and maybe high-level generic ones if needed.
+      // Stick to data changes: add, remove, move (dragend), resize, connect, disconnect, group add/remove, arrange, clear.
+    ].forEach((e) => {
+      e.startsWith("clipboard") || this.on(e, (s) => {
+        let i = e;
+        e === "node:dragend" && (i = "node:move"), this.emit("change", {
+          type: i,
+          item: s,
+          // The object (node, connection, group) or ID
+          timestamp: Date.now()
+        });
+      });
     });
   }
   /**
-   * Start dragging a connection from a slot
-   */
+       * Start dragging a connection from a slot
+       */
   _startConnectionDrag(t, e) {
     this._connectionDrag = {
       sourceSlot: t,

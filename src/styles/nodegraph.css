@@ -259,10 +259,11 @@
 .ng-slot--left.ng-slot--edge .ng-slot-connector {
   left: 0;
   top: 50%;
-  transform: translate(-50%, -50%);
+  margin-top: calc(var(--ng-slot-size, 12px) * -0.5);
+  margin-left: calc(var(--ng-slot-size, 12px) * -0.5);
 }
 
-/* Ensure label is pushed if present (add min-height/width or padding) */
+/* Ensure label is pushed */
 .ng-slot--left.ng-slot--edge .ng-slot-label {
   left: 10px;
   top: 50%;
@@ -272,14 +273,14 @@
 
 .ng-slot--left.ng-slot--edge {
   padding-left: 0;
-  /* Connector is on border, content starts inside */
 }
 
 /* Right Edge */
 .ng-slot--right.ng-slot--edge .ng-slot-connector {
   right: 0;
   top: 50%;
-  transform: translate(50%, -50%);
+  margin-top: calc(var(--ng-slot-size, 12px) * -0.5);
+  margin-right: calc(var(--ng-slot-size, 12px) * -0.5);
 }
 
 .ng-slot--right.ng-slot--edge .ng-slot-label {
@@ -297,12 +298,12 @@
 .ng-slot--top.ng-slot--edge .ng-slot-connector {
   top: 0;
   left: 50%;
-  transform: translate(-50%, -50%);
+  margin-left: calc(var(--ng-slot-size, 12px) * -0.5);
+  margin-top: calc(var(--ng-slot-size, 12px) * -0.5);
 }
 
 .ng-slot--top.ng-slot--edge .ng-slot-label {
   top: 15px;
-  /* Push inside */
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
@@ -316,12 +317,12 @@
 .ng-slot--bottom.ng-slot--edge .ng-slot-connector {
   bottom: 0;
   left: 50%;
-  transform: translate(-50%, 50%);
+  margin-left: calc(var(--ng-slot-size, 12px) * -0.5);
+  margin-bottom: calc(var(--ng-slot-size, 12px) * -0.5);
 }
 
 .ng-slot--bottom.ng-slot--edge .ng-slot-label {
   bottom: 15px;
-  /* Push inside */
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
@@ -367,12 +368,22 @@
   box-shadow: 0 0 8px currentColor;
 }
 
+/* Fix diamond rotation reset on highlight */
+.ng-slot-connector--diamond.ng-slot-connector--highlight {
+  transform: rotate(45deg) scale(1.3);
+}
+
 .ng-slot-connector--invalid {
   transform: scale(1.3);
   border-color: #ff4444 !important;
   box-shadow: 0 0 8px #ff4444;
   background-color: #4a1111 !important;
   cursor: not-allowed !important;
+}
+
+/* Fix diamond rotation reset on invalid */
+.ng-slot-connector--diamond.ng-slot-connector--invalid {
+  transform: rotate(45deg) scale(1.3);
 }
 
 .ng-slot-click-area {

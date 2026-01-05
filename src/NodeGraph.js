@@ -160,6 +160,10 @@ export class NodeGraph extends EventEmitter {
             this.emit('node:dragend', e.detail.node);
         });
 
+        this.nodesLayer.addEventListener('node:resize', (e) => {
+            this.emit('node:resize', e.detail.node);
+        });
+
         this.nodesLayer.addEventListener('node:contextmenu', (e) => {
             const { node, event } = e.detail;
             if (!this.selection.isSelected(node)) {
@@ -215,11 +219,44 @@ export class NodeGraph extends EventEmitter {
                 this._endConnectionDrag(e);
             }
         });
+
+        // --- Global Change Event ---
+        const changeEvents = [
+            'node:add', 'node:remove', 'node:dragend', 'node:resize', // Nodes
+            'connection:create', 'connection:remove',                  // Connections
+            'group:add', 'group:remove',                               // Groups
+            'graph:arrange', 'graph:clear',                             // Graph
+            'clipboard:paste', 'clipboard:cut', 'clipboard:duplicate'   // Clipboard (redundant but explicit?)
+            // Note: paste/cut/duplicate already trigger add/remove events, but specific event might be useful.
+            // User requested "change" with details.
+            // If we emit change for 'clipboard:paste', we duplicate events for the nodes added.
+            // User asked: "nuovo nodo aggiunto... duplicato...".
+            // If I duplicate, I get 'node:add'. That satisfies "nuovo nodo aggiunto" AND "duplicato" implicitly.
+            // But maybe explicit is better?
+            // "il tipo di cambiamento e se possibile l'oggetto".
+            // Let's stick to primitive changes for data consistency, and maybe high-level generic ones if needed.
+            // Stick to data changes: add, remove, move (dragend), resize, connect, disconnect, group add/remove, arrange, clear.
+        ];
+
+        changeEvents.forEach(evt => {
+            if (evt.startsWith('clipboard')) return; // Skip clipboard high-level, rely on primitives
+            this.on(evt, (detail) => {
+                // Map 'node:dragend' to 'node:move' for clarity in 'change' event?
+                let changeType = evt;
+                if (evt === 'node:dragend') changeType = 'node:move';
+
+                this.emit('change', {
+                    type: changeType,
+                    item: detail, // The object (node, connection, group) or ID
+                    timestamp: Date.now()
+                });
+            });
+        });
     }
 
     /**
-     * Start dragging a connection from a slot
-     */
+         * Start dragging a connection from a slot
+         */
     _startConnectionDrag(slot, event) {
         this._connectionDrag = {
             sourceSlot: slot,
