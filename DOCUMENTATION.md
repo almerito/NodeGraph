@@ -1,0 +1,92 @@
+
+# NodeGraph.js Documentation
+
+A lightweight, flexible node graph library with extensive customization capabilities.
+
+## 1. Graph Initialization
+```javascript
+import { NodeGraph } from './src/NodeGraph.js';
+
+const container = document.getElementById('graph-container');
+const graph = new NodeGraph(container, {
+    gridSize: 20,
+    gridColor: '#2d2d44',
+    backgroundColor: '#1a1a2e'
+});
+```
+
+## 2. Node Customization
+Create nodes using `graph.addNode(config)`.
+
+### Basic Configuration
+```javascript
+const node = graph.addNode({
+    id: 'my-node',          // Unique string ID
+    position: { x: 100, y: 100 },
+    header: { content: '<strong>Title</strong>', className: 'my-header', style: { color: 'blue' } },
+    body:   { content: '<p>Content</p>', className: 'my-body' },
+    footer: { content: 'Status: OK', className: 'my-footer' }
+});
+```
+
+### Layout Customization (Slots Containers)
+You can customize the 4 slot containers surrounding the node body. This is useful for creating custom gaps or forcing dimensions.
+```javascript
+{
+    // ...node config
+    slotsTop:    { style: { height: '30px', background: 'transparent' } },
+    slotsBottom: { style: { height: '20px' } },
+    slotsLeft:   { style: { width: '20px' } },
+    slotsRight:  { style: { width: '20px' } }
+}
+```
+
+## 3. Slot Configuration (Inputs/Outputs)
+Slots can be placed on any side (left, right, top, bottom) and customized individually.
+
+### Common Properties
+```javascript
+inputs: [
+    {
+        id: 'in1',
+        label: 'Input 1',       // Text label (pass null for no label)
+        side: 'left',           // 'left' | 'right' | 'top' | 'bottom'
+        shape: 'circle',        // 'circle' | 'square' | 'diamond' | 'arrow' | 'custom'
+        color: '#ff0000',       // Override default color (--ng-slot-color)
+        size: 10,               // Override default size (--ng-slot-size)
+        edge: false             // If true, attaches to border
+    }
+]
+```
+
+### "Edge" Slots
+Slots with `edge: true` are positioned absolutely on the border of the node.
+- **Positioning**: Automatically centered on the border line.
+- **Labels**: Absolutely positioned inside the node, floating near the connector.
+- **Layout**: 
+  - Top/Bottom edge slots default to `0px` container height to prevent unwanted vertical gaps.
+  - Left/Right edge slots maintain minimal height for stacking.
+  - Ideal for "bus" connections or compact designs.
+
+### Variables & Styling
+The library uses CSS variables for slots, which can be overridden globally, per-node, or per-slot via config.
+- `--ng-slot-size`: Diameter/Size of the connector (default 12px).
+- `--ng-slot-color`: Background color of the connector.
+
+## 4. UI Interactions
+- **Selection**: Left-click to select. Click empty space to deselect.
+- **Box Selection**: Drag Left Mouse on empty space.
+- **Pan**: 
+  - Middle Mouse Drag
+  - **Spacebar + Left Mouse Drag** (Temporarily disables box selection)
+- **Zoom**: Mouse Wheel.
+- **Connections**: Drag from an output slot to an input slot.
+- **Symbolic Connections**: `graph.connectSymbolic(nodeA, nodeB, options)` for dashed logic links.
+
+## 5. CSS Classes
+- `.ng-node`: Main node container.
+- `.ng-node-selected`: Applied when selected.
+- `.ng-slot`: Slot container (relative/absolute depending on config).
+- `.ng-slot-connector`: The visual "dot" or shape.
+- `.ng-slot-label`: Text label.
+- `.ng-connection`: SVG path for connections.

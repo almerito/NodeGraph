@@ -1,0 +1,37 @@
+voglio creare una libreria js per creare un tool di node graph simile a litegraph.js.
+
+Queste sono le funzionalità di base che voglio:
+
+- creazione di nodi con header, body, footer, slot in e out sia verticali che orizzontali.
+
+- ogni nodo può definire header, body e footer e slot opzionali
+
+- ogni nodo può definire la forma di ogni slot in e out (rotondo, quadrato, freccia, icone, ecc)
+
+- ogni nodo può definire il testo o il contenuto di header, body e footer 
+
+- ogni nodo può definire lo stile css di header, body e footer e slot in e out
+
+- gli slot in e out possono essere collegati tra loro per creare una connessione tra due nodi tramite curve bezier
+
+- le curve bezier possono essere eliminate
+
+- la grandezza degli slot e l'area di click è customizzabile
+
+- quando si entra nell'area di click, si può evidenziare (opzionale)
+
+- il canvas che contiene i nodi è scrollabile e zoomabile all'infinito
+
+- è possibile selezionare i singoli nodi o gruppi di nodi
+
+- è possibile copiare, incollare, tagliare, eliminare singoli nodi o gruppi di nodi selezionati
+
+- è possibile creare un contenitore che raggruppa e posiziona altri nodi (come in litegraph.js)
+
+- è possibile creare una griglia per aiutare a posizionare i nodi in modo preciso (passo della griglia customizzabile)
+
+- il tasto destro del mouse apre un menu contestuale che permette di fare varie cose (copia, incolla, taglia, elimina, raggruppa, crea nodo gruppo, aggiungi nodo, etc). E' possibile personalizzare questo menu ed aggiungere eventi personalizzati
+
+- cliccando col tasto destro del mouse su un gruppo, si apre un menu contestuale che permette di cambiare la label del gruppo e il colore di sfondo. E' possibile personalizzare questo menu ed aggiungere eventi personalizzati
+
+- è possibile creare collegamenti personalizzati con curve bezier tratteggiate, definendo nodo iniziale e finale, per mostrare un collegamento simbolico tra due nodi

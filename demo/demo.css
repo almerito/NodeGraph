@@ -1,0 +1,56 @@
+/* NodeGraph.js Demo Styles */
+
+/* Custom Node Headers */
+.node-input-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.node-processor-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.node-secondary-header {
+    background: linear-gradient(135deg, #ed8936 0%, #f6ad55 100%);
+}
+
+.node-output-header {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+}
+
+.node-omni-header {
+    background: linear-gradient(135deg, #ed8936 0%, #f6ad55 100%);
+}
+
+.node-edge-header {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+}
+
+/* Custom Elements inside nodes */
+.node-custom-input-wrapper {
+    padding: 5px;
+}
+
+.node-custom-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #888;
+    font-size: 11px;
+}
+
+.node-custom-input {
+    width: 100%;
+    padding: 5px;
+    background: #1a1a2e;
+    border: 1px solid #3d3d5c;
+    border-radius: 4px;
+    color: #fff;
+    box-sizing: border-box;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.ng-node-body {
+    font-size: 12px;
+}

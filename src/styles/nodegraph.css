@@ -1,0 +1,548 @@
+/**
+ * NodeGraph.js - Default Styles
+ * These styles can be customized by overriding CSS classes
+ */
+
+/* ============================================
+   Container & Layers
+   ============================================ */
+
+.ng-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #1a1a2e;
+  user-select: none;
+}
+
+.ng-viewport {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: 0 0;
+  z-index: 0;
+  /* Create stacking context */
+}
+
+.ng-svg-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 1;
+}
+
+.ng-svg-layer .ng-connections {
+  pointer-events: auto;
+}
+
+.ng-nodes-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  z-index: 2;
+}
+
+.ng-groups-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  z-index: 0;
+}
+
+/* ============================================
+   Nodes
+   ============================================ */
+
+.ng-node {
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-width: 150px;
+  background: linear-gradient(180deg, #2d2d44 0%, #252538 100%);
+  border: 1px solid #3d3d5c;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  cursor: move;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.ng-node:hover {
+  border-color: #4d4d6c;
+}
+
+.ng-node--selected {
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3), 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.ng-node--dragging {
+  opacity: 0.9;
+  z-index: 1000;
+}
+
+.ng-node-header {
+  padding: 10px 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 7px 7px 0 0;
+  color: white;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* ============================================
+   Node Layout (Updated for 4-sides)
+   ============================================ */
+.ng-node-wrapper {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.ng-node-slots-top {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 8px;
+  /* padding-bottom: 4px;
+  min-height: 10px; */
+}
+
+/* .ng-node-slots-top already modified by user */
+
+.ng-node-slots-bottom {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 8px;
+  /* padding-top: 4px;
+  min-height: 10px; */
+}
+
+.ng-node-middle {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  min-height: 0;
+}
+
+.ng-node-slots-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 0;
+  justify-content: center;
+}
+
+.ng-node-slots-right {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 0;
+  justify-content: center;
+}
+
+.ng-node-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* ============================================
+   Slots Styling
+   ============================================ */
+
+.ng-slot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  position: relative;
+  min-height: 20px;
+}
+
+/* Side specific layouts */
+.ng-slot--left {
+  flex-direction: row;
+  margin-left: -8px;
+  /* Pull closer to edge */
+}
+
+.ng-slot--right {
+  flex-direction: row-reverse;
+  margin-right: -8px;
+}
+
+.ng-slot--top {
+  flex-direction: column;
+  margin-top: -8px;
+}
+
+.ng-slot--bottom {
+  flex-direction: column-reverse;
+  margin-bottom: -8px;
+}
+
+/* Edge Positioning (On Border) */
+.ng-slot--edge {
+  /* Ensure container is relative so absolute connector works */
+  position: relative;
+  /* Reset margins that might pull it */
+  margin: 0 !important;
+  /* Ensure slot has dimension even if contents are absolute */
+}
+
+/* For Left/Right edge slots, we might want vertical height to stack them, 
+   but for Top/Bottom edge slots, their height pushes the node content, which creates gaps.
+   We collapse them to 0 height. */
+
+.ng-slot--left.ng-slot--edge,
+.ng-slot--right.ng-slot--edge {
+  min-height: 24px;
+  /* Default height for stacking */
+}
+
+.ng-slot--top.ng-slot--edge,
+.ng-slot--bottom.ng-slot--edge {
+  min-height: 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+  /* Keep width for horizontal distribution if needed */
+  min-width: 24px;
+}
+
+/* Make connector absolute on the edge */
+.ng-slot--edge .ng-slot-connector {
+  position: absolute;
+  z-index: 10;
+}
+
+/* Make label absolute on edge slots too */
+.ng-slot--edge .ng-slot-label {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Left Edge */
+.ng-slot--left.ng-slot--edge .ng-slot-connector {
+  left: 0;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Ensure label is pushed if present (add min-height/width or padding) */
+.ng-slot--left.ng-slot--edge .ng-slot-label {
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: left;
+}
+
+.ng-slot--left.ng-slot--edge {
+  padding-left: 0;
+  /* Connector is on border, content starts inside */
+}
+
+/* Right Edge */
+.ng-slot--right.ng-slot--edge .ng-slot-connector {
+  right: 0;
+  top: 50%;
+  transform: translate(50%, -50%);
+}
+
+.ng-slot--right.ng-slot--edge .ng-slot-label {
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: right;
+}
+
+.ng-slot--right.ng-slot--edge {
+  padding-right: 0;
+}
+
+/* Top Edge */
+.ng-slot--top.ng-slot--edge .ng-slot-connector {
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.ng-slot--top.ng-slot--edge .ng-slot-label {
+  top: 15px;
+  /* Push inside */
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.ng-slot--top.ng-slot--edge {
+  padding-top: 0;
+}
+
+/* Bottom Edge */
+.ng-slot--bottom.ng-slot--edge .ng-slot-connector {
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 50%);
+}
+
+.ng-slot--bottom.ng-slot--edge .ng-slot-label {
+  bottom: 15px;
+  /* Push inside */
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.ng-slot--bottom.ng-slot--edge {
+  padding-bottom: 0;
+}
+
+.ng-slot-connector {
+  width: var(--ng-slot-size, 12px);
+  height: var(--ng-slot-size, 12px);
+  background: var(--ng-slot-color, #667eea);
+  border: 2px solid #2d2d44;
+  position: relative;
+  border-radius: 50%;
+  transition: transform 0.15s, box-shadow 0.15s;
+  cursor: crosshair;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.ng-slot-connector--circle {
+  border-radius: 50%;
+}
+
+.ng-slot-connector--square {
+  border-radius: 2px;
+}
+
+.ng-slot-connector--arrow {
+  border-radius: 2px;
+  clip-path: polygon(0% 0%, 75% 0%, 100% 50%, 75% 100%, 0% 100%);
+}
+
+.ng-slot-connector--diamond {
+  border-radius: 0;
+  transform: rotate(45deg);
+}
+
+.ng-slot-connector--highlight {
+  transform: scale(1.3);
+  box-shadow: 0 0 8px currentColor;
+}
+
+.ng-slot-click-area {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  cursor: crosshair;
+}
+
+.ng-slot-label {
+  color: #c0c0c0;
+  font-size: 11px;
+  font-family: 'Segoe UI', sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  line-height: 1;
+}
+
+
+/* ============================================
+   Connections
+   ============================================ */
+
+.ng-connection {
+  stroke: #667eea;
+  stroke-width: 2;
+  fill: none;
+  pointer-events: stroke;
+  cursor: pointer;
+  transition: stroke 0.2s, stroke-width 0.2s;
+}
+
+.ng-connection:hover,
+.ng-connection--hover {
+  stroke-width: 3;
+  stroke: #8b9ff2;
+}
+
+.ng-connection--selected {
+  stroke: #ff6b6b;
+  stroke-width: 3;
+}
+
+.ng-connection--temp {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* ============================================
+   Groups
+   ============================================ */
+
+.ng-group {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 2px dashed rgba(102, 126, 234, 0.4);
+  border-radius: 12px;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.ng-group--dragging {
+  opacity: 0.8;
+}
+
+.ng-group-header {
+  padding: 6px 12px;
+  cursor: move;
+  border-radius: 10px 10px 0 0;
+  background: rgba(102, 126, 234, 0.2);
+}
+
+.ng-group-label {
+  color: #aaa;
+  font-size: 12px;
+  font-weight: 500;
+  outline: none;
+}
+
+.ng-group-label:focus {
+  color: #fff;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+.ng-group-resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  cursor: se-resize;
+  background: linear-gradient(135deg, transparent 50%, rgba(102, 126, 234, 0.3) 50%);
+  border-radius: 0 0 10px 0;
+}
+
+/* ============================================
+   Selection Box
+   ============================================ */
+
+.ng-selection-box {
+  position: absolute;
+  border: 1px solid rgba(102, 126, 234, 0.8);
+  background: rgba(102, 126, 234, 0.1);
+  pointer-events: none;
+}
+
+/* ============================================
+   Context Menu
+   ============================================ */
+
+.ng-context-menu {
+  position: fixed;
+  min-width: 180px;
+  background: linear-gradient(180deg, #2d2d44 0%, #252538 100%);
+  border: 1px solid #3d3d5c;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  padding: 6px 0;
+  z-index: 10000;
+  animation: ng-context-menu-appear 0.15s ease-out;
+}
+
+@keyframes ng-context-menu-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.ng-context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  color: #ccc;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.ng-context-menu-item:hover {
+  background: rgba(102, 126, 234, 0.2);
+  color: #fff;
+}
+
+.ng-context-menu-item--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ng-context-menu-item--disabled:hover {
+  background: transparent;
+  color: #ccc;
+}
+
+.ng-context-menu-item--danger:hover {
+  background: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+}
+
+.ng-context-menu-icon {
+  width: 18px;
+  text-align: center;
+}
+
+.ng-context-menu-label {
+  flex: 1;
+}
+
+.ng-context-menu-shortcut {
+  color: #666;
+  font-size: 11px;
+}
+
+.ng-context-menu-separator {
+  height: 1px;
+  background: #3d3d5c;
+  margin: 6px 0;
+}
+
+/* ============================================
+   Grid
+   ============================================ */
+
+.ng-grid {
+  pointer-events: none;
+}

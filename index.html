@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NodeGraph.js Demo</title>
+  <link rel="stylesheet" href="/src/styles/nodegraph.css">
+  <link rel="stylesheet" href="demo/demo.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      overflow: hidden;
+    }
+
+    #app {
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .demo-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50px;
+      background: rgba(26, 26, 46, 0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #333;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 1000;
+      gap: 20px;
+    }
+
+    .demo-header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .demo-header button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      cursor: pointer;
+      font-size: 13px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .demo-header button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    #graph-container {
+      width: 100%;
+      height: calc(100vh - 50px);
+      margin-top: 50px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <header class="demo-header">
+      <h1>NodeGraph.js</h1>
+      <button id="btn-add-node">+ Add Node</button>
+      <button id="btn-clear">Clear All</button>
+    </header>
+    <div id="graph-container"></div>
+  </div>
+  <script type="module" src="/demo/demo.js"></script>
+</body>
+
+</html>
