@@ -224,6 +224,17 @@ export class ContextMenuManager {
         if (!this.menuItems[menuType]) {
             this.menuItems[menuType] = [];
         }
+
+        // Check if item with ID exists
+        if (item.id) {
+            const index = this.menuItems[menuType].findIndex(i => i.id === item.id);
+            if (index !== -1) {
+                // Replace existing
+                this.menuItems[menuType][index] = item;
+                return;
+            }
+        }
+
         this.menuItems[menuType].push(item);
     }
 

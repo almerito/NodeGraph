@@ -1377,7 +1377,14 @@ class R {
    * @param {object} item - Menu item configuration
    */
   addItem(t, e) {
-    this.menuItems[t] || (this.menuItems[t] = []), this.menuItems[t].push(e);
+    if (this.menuItems[t] || (this.menuItems[t] = []), e.id) {
+      const s = this.menuItems[t].findIndex((i) => i.id === e.id);
+      if (s !== -1) {
+        this.menuItems[t][s] = e;
+        return;
+      }
+    }
+    this.menuItems[t].push(e);
   }
   /**
    * Remove a menu item
