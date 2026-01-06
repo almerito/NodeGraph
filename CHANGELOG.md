@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.6] - 2026-01-06
+### Added
+- **Symbolic Connection Management**: Added `graph.disconnectSymbolic(nodeA, nodeB)` to easily remove all symbolic links between two nodes.
+
+## [1.0.5] - 2026-01-06
+### Added
+- **Persistent Node Data**: Added `data` container to Nodes. This object persists across copy/paste/duplicate operations and serialization, allowing storage of custom metadata.
+
 ## [1.0.4] - 2026-01-06
 ### Fixed
 - **Clipboard & Symbolic Connections**: Fixed a crash (`undefined reading 'id'`) when copying symbolic connections (dashed) to the clipboard.

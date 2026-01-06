@@ -580,6 +580,28 @@ export class NodeGraph extends EventEmitter {
     }
 
     /**
+     * Remove all symbolic connections between two nodes
+     * @param {Node} nodeA 
+     * @param {Node} nodeB 
+     */
+    disconnectSymbolic(nodeA, nodeB) {
+        const toRemove = [];
+        this.connections.forEach(conn => {
+            // Check if it's a connection between these two nodes
+            // Symbolic connections use the Node instance itself as input/output slot
+            // We check both directions to ensure clean removal of any link between them
+            const isAB = conn.outputSlot === nodeA && conn.inputSlot === nodeB;
+            const isBA = conn.outputSlot === nodeB && conn.inputSlot === nodeA;
+
+            if (isAB || isBA) {
+                toRemove.push(conn.id);
+            }
+        });
+
+        toRemove.forEach(id => this.disconnect(id));
+    }
+
+    /**
      * Add a group to the graph
      * @param {object} config - Group configuration
      * @returns {Group} Created group

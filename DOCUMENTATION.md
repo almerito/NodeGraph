@@ -22,6 +22,7 @@ Create nodes using `graph.addNode(config)`.
 ```javascript
 const node = graph.addNode({
     id: 'my-node',          // Unique string ID
+    data: { myValue: 123 }, // Custom persistent data container
     position: { x: 100, y: 100 },
     resizable: true,        // Enable resizing handles (bottom-right)
     header: { content: '<strong>Title</strong>', className: 'my-header', style: { color: 'blue' } },
@@ -134,3 +135,50 @@ Triggered for *any* state change in the graph. Useful for auto-saving, history m
 
 ### Canvas Events
 - **`canvas:add-node`**: `(position: {x, y})` - Fired from context menu "Add Node". Listen to this to show your node creation modal/menu.
+
+## 7. State Management (Save/Load)
+You can save and restore the entire graph state (nodes, connections, groups, viewport, and persistent data) using `serialize` and `deserialize`.
+
+### Saving
+```javascript
+const savedData = graph.serialize(); 
+// Returns a JSON-serializable object containing:
+// { nodes: [...], connections: [...], groups: [...], viewport: {...} }
+
+const jsonString = JSON.stringify(savedData);
+// Save jsonString to localStorage, file, or database
+```
+
+### Loading
+```javascript
+const savedData = JSON.parse(jsonString); // Retrieve from storage
+graph.deserialize(savedData);
+```
+- `deserialize` automatically clears the current graph before loading.
+- It restores all IDs, positions, connections, and custom `data`.
+
+## 8. Symbolic Connections (Dashed)
+Symbolic connections represent logical relationships without using specific input/output slots. They connect two node bodies directly and are rendered as dashed lines.
+
+```javascript
+const nodeA = graph.getNode('id-1');
+const nodeB = graph.getNode('id-2');
+
+// Create a dashed connection
+graph.connectSymbolic(nodeA, nodeB, {
+    color: '#ffcc00', // Optional style override
+    width: 2
+});
+```
+- **Interactive**: They are non-interactive by default (no click/drag events) to distinguish them from functional data flow connections.
+- **Persistence**: They are saved and restored automatically via `serialize`/`deserialize`.
+
+### Removing
+Use `graph.disconnect(connectionId)` just like regular connections.
+```javascript
+// Remove a specific connection
+graph.disconnect(connection.id);
+
+// Remove ALL symbolic connections between two nodes
+graph.disconnectSymbolic(nodeA, nodeB);
+```

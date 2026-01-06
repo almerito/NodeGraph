@@ -25,6 +25,7 @@ export class Node {
         this.draggable = config.draggable !== false;
         this.selected = false;
         this.resizable = config.resizable || false;
+        this.data = config.data || {};
 
         this.inputSlots = new Map();
         this.outputSlots = new Map();
@@ -622,6 +623,7 @@ export class Node {
     serialize() {
         return {
             id: this.id,
+            data: JSON.parse(JSON.stringify(this.data)), // Deep copy to ensure independence
             position: { ...this.position },
 
             header: this._extractConfig(this.headerElement),
