@@ -51,7 +51,7 @@ function z(g, t) {
     e || (g.apply(this, s), e = !0, setTimeout(() => e = !1, t));
   };
 }
-function X(g, t) {
+function R(g, t) {
   let e;
   return function(...s) {
     clearTimeout(e), e = setTimeout(() => g.apply(this, s), t);
@@ -97,7 +97,7 @@ class L {
    * @param {string} config.customIcon - Custom icon HTML (for custom shape)
    */
   constructor(t) {
-    this.id = t.id || S("slot"), this.node = t.node, this.type = t.type, this.label = t.label || "", this.shape = t.shape || w.CIRCLE, this.side = t.side || (t.type === "input" ? "left" : "right"), this.align = t.align, this.edge = t.edge || !1, t.orientation ? this.orientation = t.orientation : this.orientation = this.side === "top" || this.side === "bottom" ? C.VERTICAL : C.HORIZONTAL, this.color = t.color || "#667eea", this.size = t.size || 12, this.clickAreaSize = t.clickAreaSize || this.size + 10, this.highlightOnHover = t.highlightOnHover !== !1, this.customIcon = t.customIcon || null, t.maxConnections !== void 0 ? this.maxConnections = t.maxConnections : this.maxConnections = this.type === "input" ? 1 : 1 / 0, this.connections = /* @__PURE__ */ new Set(), this._createElement(), this._bindEvents();
+    this.id = t.id || S("slot"), this.node = t.node, this.type = t.type, this.label = t.label || "", this.shape = t.shape || w.CIRCLE, this.side = t.side || (t.type === "input" ? "left" : "right"), this.align = t.align, this.edge = t.edge || !1, t.orientation ? this.orientation = t.orientation : this.orientation = this.side === "top" || this.side === "bottom" ? C.VERTICAL : C.HORIZONTAL, this.color = t.color || "#667eea", this.size = t.size || 12, this.clickAreaSize = t.clickAreaSize || this.size + 10, this.highlightOnHover = t.highlightOnHover !== !1, this.highlightOnHover = t.highlightOnHover !== !1, this.customIcon = t.customIcon || null, this.group = t.group || null, t.maxConnections !== void 0 ? this.maxConnections = t.maxConnections : this.maxConnections = this.type === "input" ? 1 : 1 / 0, this.connections = /* @__PURE__ */ new Set(), this._createElement(), this._bindEvents();
   }
   /**
    * Create the slot DOM element
@@ -205,7 +205,8 @@ class L {
       align: this.align,
       edge: this.edge,
       color: this.color,
-      size: this.size
+      size: this.size,
+      group: this.group
     };
   }
 }
@@ -521,6 +522,19 @@ class M {
     };
   }
   /**
+   * Get slots belonging to a specific group
+   * @param {string} groupName 
+   * @returns {Slot[]}
+   */
+  getSlotsByGroup(t) {
+    const e = [];
+    return this.inputSlots.forEach((s) => {
+      s.group === t && e.push(s);
+    }), this.outputSlots.forEach((s) => {
+      s.group === t && e.push(s);
+    }), e;
+  }
+  /**
    * Get the connection point for this node (center)
    * @returns {object} {x, y}
    */
@@ -544,7 +558,7 @@ function P(g, t, e = "horizontal", s = "horizontal") {
   const p = Math.min(Math.abs(i) / 2, Math.abs(n) / 2, 100), l = Math.max(p, 50);
   return e === "horizontal" ? (o = g.x + l, a = g.y) : (o = g.x, a = g.y + l), s === "horizontal" ? (h = t.x - l, r = t.y) : (h = t.x, r = t.y - l), `M ${g.x} ${g.y} C ${o} ${a}, ${h} ${r}, ${t.x} ${t.y}`;
 }
-function G(g, t) {
+function X(g, t) {
   return {
     x: (g.x + t.x) / 2,
     y: (g.y + t.y) / 2
@@ -1480,7 +1494,7 @@ class B {
     this.close();
   }
 }
-class R {
+class G {
   /**
    * @param {NodeGraph} graph - Parent graph
    */
@@ -1616,6 +1630,8 @@ class k extends I {
       },
       snapToGrid: e.snapToGrid !== !1,
       bidirectional: e.bidirectional !== !1,
+      enforceSlotGroups: e.enforceSlotGroups === !0,
+      enforceDirection: e.enforceDirection !== !1,
       ...e
     }, this.nodes = /* @__PURE__ */ new Map(), this.connections = /* @__PURE__ */ new Map(), this.groups = /* @__PURE__ */ new Map(), this._connectionDrag = null, this._tempPath = null, this._createLayers(), this._initManagers(), this._bindEvents();
   }
@@ -1636,7 +1652,7 @@ class k extends I {
     }), this.selection = new T(this), this.grid = new $({
       svgLayer: this.svgLayer,
       options: this.options.grid
-    }), this.contextMenu = new B(this), this.clipboard = new R(this);
+    }), this.contextMenu = new B(this), this.clipboard = new G(this);
   }
   /**
    * Bind global event listeners
@@ -1760,7 +1776,7 @@ class k extends I {
             valid: !0
             // Assume valid initially
           };
-          (c.node === this._connectionDrag.sourceSlot.node || c.type === this._connectionDrag.sourceSlot.type) && (d.valid = !1), this.emit("connection:validate", d), this._connectionDrag.isValid = d.valid;
+          (c.node === this._connectionDrag.sourceSlot.node || this.options.enforceDirection && c.type === this._connectionDrag.sourceSlot.type) && (d.valid = !1), d.valid && this.options.enforceSlotGroups && c.group !== this._connectionDrag.sourceSlot.group && (d.valid = !1), this.emit("connection:validate", d), this._connectionDrag.isValid = d.valid;
           const u = c.element.querySelector(".ng-slot-connector");
           u && (d.valid ? u.classList.add("ng-slot-connector--highlight") : u.classList.add("ng-slot-connector--invalid"));
         }
@@ -1780,7 +1796,7 @@ class k extends I {
     if (e && this._connectionDrag.isValid) {
       const s = this._connectionDrag.sourceSlot;
       let i, n;
-      if (s.type === "output" && e.type === "input" ? (i = s, n = e) : s.type === "input" && e.type === "output" && (i = e, n = s), i && n) {
+      if (s.type === "output" && e.type === "input" ? (i = s, n = e) : s.type === "input" && e.type === "output" ? (i = e, n = s) : this.options.enforceDirection || (i = s, n = e), i && n) {
         if (n.connections.size >= n.maxConnections) {
           const o = n.connections.size - n.maxConnections + 1, a = Array.from(n.connections);
           for (let h = 0; h < o; h++)
@@ -1844,8 +1860,8 @@ class k extends I {
    * @returns {Connection} Created connection
    */
   connect(t, e, s = {}) {
-    if (t.type !== "output" || e.type !== "input")
-      return console.warn("NodeGraph: Invalid connection - must be output to input"), null;
+    if (this.options.enforceDirection && (t.type !== "output" || e.type !== "input"))
+      return console.warn("NodeGraph: Invalid connection - must be output to input (enforceDirection is true)"), null;
     for (const n of this.connections.values())
       if (n.outputSlot === t && n.inputSlot === e)
         return n;
@@ -2097,7 +2113,7 @@ class k extends I {
   }
 }
 export {
-  R as ClipboardManager,
+  G as ClipboardManager,
   N as Connection,
   B as ContextMenuManager,
   I as EventEmitter,
@@ -2111,8 +2127,8 @@ export {
   w as SlotShape,
   D as ViewportManager,
   P as calculateBezierPath,
-  X as debounce,
-  G as getBezierMidpoint,
+  R as debounce,
+  X as getBezierMidpoint,
   z as throttle,
   S as uid
 };

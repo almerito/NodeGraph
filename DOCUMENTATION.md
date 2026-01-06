@@ -13,7 +13,8 @@ const graph = new NodeGraph(container, {
     gridColor: '#2d2d44',
     gridColor: '#2d2d44',
     backgroundColor: '#1a1a2e',
-    bidirectional: true // Allow connections from Input -> Output
+    bidirectional: true, // Allow connections from Input -> Output
+    enforceSlotGroups: false // If true, only slots with matching 'group' can connect
 });
 ```
 
@@ -58,7 +59,8 @@ inputs: [
         shape: 'circle',        // 'circle' | 'square' | 'diamond' | 'arrow' | 'custom'
         color: '#ff0000',       // Override default color (--ng-slot-color)
         size: 10,               // Override default size (--ng-slot-size)
-        edge: false             // If true, attaches to border
+        edge: false,             // If true, attaches to border
+        group: 'horizontal'     // Logical grouping (e.g. for pairing Inputs/Outputs)
     }
 ]
 ```

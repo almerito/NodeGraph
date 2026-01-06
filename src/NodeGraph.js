@@ -45,6 +45,8 @@ export class NodeGraph extends EventEmitter {
             },
             snapToGrid: options.snapToGrid !== false,
             bidirectional: options.bidirectional !== false,
+            enforceSlotGroups: options.enforceSlotGroups === true,
+            enforceDirection: options.enforceDirection !== false,
             ...options
         };
 
@@ -362,9 +364,16 @@ export class NodeGraph extends EventEmitter {
                     if (targetSlot.node === this._connectionDrag.sourceSlot.node) {
                         context.valid = false;
                     }
-                    // Default Rule 2: Type mismatch
-                    else if (targetSlot.type === this._connectionDrag.sourceSlot.type) {
+                    // Default Rule 2: Type mismatch (In -> Out or Out -> In only)
+                    else if (this.options.enforceDirection && targetSlot.type === this._connectionDrag.sourceSlot.type) {
                         context.valid = false;
+                    }
+
+                    // Default Rule 3: Slot Groups (if forced)
+                    if (context.valid && this.options.enforceSlotGroups) {
+                        if (targetSlot.group !== this._connectionDrag.sourceSlot.group) {
+                            context.valid = false;
+                        }
                     }
 
                     // Emit event to allow user modification
@@ -410,6 +419,11 @@ export class NodeGraph extends EventEmitter {
             } else if (sourceSlot.type === 'input' && targetSlot.type === 'output') {
                 outputSlot = targetSlot;
                 inputSlot = sourceSlot;
+            } else if (!this.options.enforceDirection) {
+                // Allow non-standard connections (In-In, Out-Out)
+                // Treat source as connection source (outputSlot) and target as connection destination (inputSlot)
+                outputSlot = sourceSlot;
+                inputSlot = targetSlot;
             }
 
             if (outputSlot && inputSlot) {
@@ -518,8 +532,8 @@ export class NodeGraph extends EventEmitter {
      */
     connect(outputSlot, inputSlot, style = {}) {
         // Validate
-        if (outputSlot.type !== 'output' || inputSlot.type !== 'input') {
-            console.warn('NodeGraph: Invalid connection - must be output to input');
+        if (this.options.enforceDirection && (outputSlot.type !== 'output' || inputSlot.type !== 'input')) {
+            console.warn('NodeGraph: Invalid connection - must be output to input (enforceDirection is true)');
             return null;
         }
 

@@ -283,12 +283,97 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Test Button for Bidirectional
+    const testBtn = document.createElement('button');
+    testBtn.textContent = "Run Bidirectional Test";
+    testBtn.style.position = 'absolute';
+    testBtn.style.bottom = '20px';
+    testBtn.style.left = '20px';
+    testBtn.style.zIndex = '1000';
+    testBtn.style.padding = '10px 20px';
+    testBtn.style.background = '#e53e3e';
+    testBtn.style.color = 'white';
+    testBtn.style.border = 'none';
+    testBtn.style.borderRadius = '5px';
+    testBtn.style.cursor = 'pointer';
+    testBtn.onclick = async () => {
+        console.log("Running Bidirectional Test...");
+        const viewportState = graph.viewport.getState();
+
+        // 1. Create Source Node (Input Source for drag)
+        const nodeSrc = graph.addNode({
+            id: 'test-src-' + Date.now(),
+            position: { x: 100, y: 100 },
+            inputs: [{ id: 'in1', label: 'Start Drag Here' }]
+        });
+
+        // 2. Create Target Node (Output Target for drag)
+        const nodeTgt = graph.addNode({
+            id: 'test-tgt-' + Date.now(),
+            position: { x: 400, y: 100 },
+            outputs: [{ id: 'out1', label: 'Drop Here' }]
+        });
+
+        // Wait for rendering
+        await new Promise(r => setTimeout(r, 100));
+
+        try {
+            const inputSlot = nodeSrc.getInput('in1');
+            const outputSlot = nodeTgt.getOutput('out1');
+
+            // 3. Start Drag from Input
+            console.log("Step 1: Start Drag from Input");
+            graph._startConnectionDrag(inputSlot, { clientX: 0, clientY: 0 });
+
+            if (!graph._connectionDrag) throw new Error("Drag did not start! (Check bidirectional option)");
+
+            // 4. Move to Output
+            // Need screen coordinates of the Output slot's connector
+            const rect = outputSlot.connectorElement.getBoundingClientRect();
+            const targetX = rect.left + rect.width / 2;
+            const targetY = rect.top + rect.height / 2;
+
+            console.log("Step 2: Move to Output", targetX, targetY);
+
+            // Mock triggering internal update (since we can't easily dispatch real mousemove that elementFromPoint sees trustedly in all envs, but elementFromPoint usually works with coords)
+            // Note: elementFromPoint works on visual layout.
+
+            // We'll call _updateConnectionDrag directly with coordinates
+            graph._updateConnectionDrag({ clientX: targetX, clientY: targetY });
+
+            // Check if valid
+            if (!graph._connectionDrag.targetSlot) throw new Error("Target slot not detected!");
+            if (graph._connectionDrag.targetSlot !== outputSlot) throw new Error("Wrong target slot detected!");
+            if (!graph._connectionDrag.isValid) throw new Error("Connection marked as INVALID!");
+
+            // 5. End Drag
+            console.log("Step 3: End Drag (Create Connection)");
+            graph._endConnectionDrag({ clientX: targetX, clientY: targetY });
+
+            // 6. Verify Connection
+            const isConnected = outputSlot.connections.size > 0 && inputSlot.connections.size > 0;
+            if (isConnected) {
+                alert("TEST PASSED: Bidirectional connection created successfully!");
+                console.log("TEST PASSED");
+            } else {
+                throw new Error("Connection NOT created after drag end");
+            }
+
+            // Cleanup
+            // graph.removeNode(nodeSrc.id);
+            // graph.removeNode(nodeTgt.id);
+
+        } catch (e) {
+            console.error(e);
+            alert("TEST FAILED: " + e.message);
+        }
+    };
+    document.body.appendChild(testBtn);
+
     // Add a group
     const group = graph.addGroup({
         label: 'Processing Group',
         position: { x: 420, y: 70 },
-        size: { width: 220, height: 350 },
-        color: 'rgba(102, 126, 234, 0.1)'
     });
     group.addNode(node2);
     group.addNode(node3);

@@ -641,6 +641,18 @@ export class Node {
     }
 
     /**
+     * Get slots belonging to a specific group
+     * @param {string} groupName 
+     * @returns {Slot[]}
+     */
+    getSlotsByGroup(groupName) {
+        const slots = [];
+        this.inputSlots.forEach(s => { if (s.group === groupName) slots.push(s); });
+        this.outputSlots.forEach(s => { if (s.group === groupName) slots.push(s); });
+        return slots;
+    }
+
+    /**
      * Get the connection point for this node (center)
      * @returns {object} {x, y}
      */

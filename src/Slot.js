@@ -70,7 +70,9 @@ export class Slot {
         this.size = config.size || 12;
         this.clickAreaSize = config.clickAreaSize || this.size + 10;
         this.highlightOnHover = config.highlightOnHover !== false;
+        this.highlightOnHover = config.highlightOnHover !== false;
         this.customIcon = config.customIcon || null;
+        this.group = config.group || null; // For logical grouping (e.g. "horizontal" vs "vertical")
 
         // Connections limit
         if (config.maxConnections !== undefined) {
@@ -307,7 +309,8 @@ export class Slot {
             align: this.align,
             edge: this.edge,
             color: this.color,
-            size: this.size
+            size: this.size,
+            group: this.group
         };
     }
 }
