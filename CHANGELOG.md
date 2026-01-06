@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.8] - 2026-01-06
+### Fixed
+- **Connection Dragging**: Fixed an issue where the temporary connection line could block mouse events, preventing connection validation when dragging from Input to Output (Reverse connection).
+
 ## [1.0.7] - 2026-01-06
 ### Added
 - **Bidirectional Connections**: Added `bidirectional` option (default `true`) to Graph initialization. If set to `false`, connections can only be created by dragging from Output to Input slots.

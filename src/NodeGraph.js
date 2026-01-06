@@ -276,6 +276,7 @@ export class NodeGraph extends EventEmitter {
         this._tempPath.setAttribute('stroke-width', '2');
         this._tempPath.setAttribute('fill', 'none');
         this._tempPath.setAttribute('stroke-dasharray', '5,5');
+        this._tempPath.style.pointerEvents = 'none'; // Ensure it doesn't block hit testing
         this.svgLayer.appendChild(this._tempPath);
 
         this._updateConnectionDrag(event);
