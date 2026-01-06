@@ -1615,6 +1615,7 @@ class k extends I {
         ...e.zoom
       },
       snapToGrid: e.snapToGrid !== !1,
+      bidirectional: e.bidirectional !== !1,
       ...e
     }, this.nodes = /* @__PURE__ */ new Map(), this.connections = /* @__PURE__ */ new Map(), this.groups = /* @__PURE__ */ new Map(), this._connectionDrag = null, this._tempPath = null, this._createLayers(), this._initManagers(), this._bindEvents();
   }
@@ -1717,10 +1718,10 @@ class k extends I {
        * Start dragging a connection from a slot
        */
   _startConnectionDrag(t, e) {
-    this._connectionDrag = {
+    !this.options.bidirectional && t.type === "input" || (this._connectionDrag = {
       sourceSlot: t,
       startPos: t.getConnectionPoint()
-    }, this._tempPath = document.createElementNS("http://www.w3.org/2000/svg", "path"), this._tempPath.classList.add("ng-connection", "ng-connection--temp"), this._tempPath.setAttribute("stroke", t.color), this._tempPath.setAttribute("stroke-width", "2"), this._tempPath.setAttribute("fill", "none"), this._tempPath.setAttribute("stroke-dasharray", "5,5"), this.svgLayer.appendChild(this._tempPath), this._updateConnectionDrag(e);
+    }, this._tempPath = document.createElementNS("http://www.w3.org/2000/svg", "path"), this._tempPath.classList.add("ng-connection", "ng-connection--temp"), this._tempPath.setAttribute("stroke", t.color), this._tempPath.setAttribute("stroke-width", "2"), this._tempPath.setAttribute("fill", "none"), this._tempPath.setAttribute("stroke-dasharray", "5,5"), this.svgLayer.appendChild(this._tempPath), this._updateConnectionDrag(e));
   }
   /**
    * Update connection drag path

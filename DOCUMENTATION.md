@@ -11,7 +11,9 @@ const container = document.getElementById('graph-container');
 const graph = new NodeGraph(container, {
     gridSize: 20,
     gridColor: '#2d2d44',
-    backgroundColor: '#1a1a2e'
+    gridColor: '#2d2d44',
+    backgroundColor: '#1a1a2e',
+    bidirectional: true // Allow connections from Input -> Output
 });
 ```
 

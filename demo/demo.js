@@ -15,21 +15,30 @@ document.addEventListener('DOMContentLoaded', () => {
             min: 0.25,
             max: 4
         },
-        snapToGrid: true
+        snapToGrid: true,
+        bidirectional: true // Enable bidirectional connection dragging (Input -> Output)
     });
 
+    // Global Change Listener
     graph.on('change', (event) => {
-        // event.type: 'node:add', 'node:move', 'node:resize', 'connection:create', etc.
-        // event.item: L'oggetto coinvolto (Node, Connection, Group) o il suo ID
-        // event.timestamp: Timestamp della modifica
+        // console.log('Change Event:', event.type, event.item);
+    });
 
-        console.log('Modifica:', event.type, event.item);
+    // Clipboard Pasting Interception
+    graph.on('clipboard:pasting', (event) => {
+        const { data, originalId } = event.detail;
+        console.log('Pasting node:', originalId, data);
+
+        // Example: Modify info on paste
+        if (data.header && data.header.content) {
+            data.header.content += ' (Copy)';
+        }
     });
 
     // Create sample nodes
     const node1 = graph.addNode({
         id: 'node-1',
-        position: { x: 100, y: 150 },
+        position: { x: 50, y: 150 },
         header: { content: '<strong>Input Node</strong>', className: 'node-input-header' },
         body: { content: '<p>This is an input source</p>' },
         outputs: [
@@ -39,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const node2 = graph.addNode({
         id: 'node-2',
-        position: { x: 400, y: 100 },
+        position: { x: 450, y: 100 },
         header: { content: '<strong>Processor</strong>', className: 'node-processor-header' },
         body: { content: '<p>Processes the data</p>' },
         inputs: [
@@ -53,9 +62,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const node3 = graph.addNode({
         id: 'node-3',
-        position: { x: 400, y: 300 },
-        header: { content: '<strong>Secondary</strong>', className: 'node-secondary-header' },
-        body: { content: '<p>Secondary input</p>' },
+        position: { x: 450, y: 350 },
+        // Persistent Data Example
+        data: { secretValue: 123, type: 'secondary' },
+        header: { content: '<strong>Node with Data</strong>', className: 'node-secondary-header' },
+        body: { content: '<p>Has persistent <code>data</code> property.</p>' },
+        footer: { content: 'Data: { secretValue: 123 }' },
         outputs: [
             { id: 'out1', label: 'Value', shape: SlotShape.DIAMOND, color: '#ed8936' }
         ]
@@ -63,8 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const node4 = graph.addNode({
         id: 'node-4',
-        position: { x: 700, y: 180 },
-        header: { content: '<strong>Output Node</strong>', className: 'node-output-header' }, // Use class
+        position: { x: 850, y: 200 },
+        header: { content: '<strong>Output Node</strong>', className: 'node-output-header' },
         body: {
             content: `
         <div class="node-custom-input-wrapper">
@@ -82,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Complex Node: Slots on all sides
     const node5 = graph.addNode({
         id: 'node-complex',
-        position: { x: 700, y: 50 },
+        position: { x: 850, y: 50 },
         header: { content: '<strong>Omni Node</strong>', className: 'node-omni-header' },
         body: { content: '<p class="text-center">Slots everywhere!</p>' },
         footer: { content: '4-way connectivity' },
@@ -99,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Edge Node: Slots on the border
     const node6 = graph.addNode({
         id: 'node-edge',
-        position: { x: 100, y: 350 },
+        position: { x: 50, y: 450 },
         header: { content: '<strong>Edge Node</strong>', className: 'node-edge-header' },
         body: { content: '<p>Connectors on the edge</p>' },
         inputs: [
@@ -112,27 +124,10 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
     });
 
-    // Edge Node: Slots on the border
-    const node7 = graph.addNode({
-        id: 'node-edge-2',
-        position: { x: 100, y: 350 },
-        header: { content: '<strong>Edge Node</strong>', style: { background: 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)' } },
-        body: { content: '<p>Connectors on the edge, no label</p>' },
-        footer: { content: 'Variable sizes' },
-        inputs: [
-            { id: 'edge_in', label: null, side: 'left', edge: true, color: '#4fd1c5' },
-            { id: 'edge_top', label: null, side: 'top', edge: true, color: '#f6e05e' }
-        ],
-        outputs: [
-            { id: 'edge_out', label: null, side: 'right', size: 20, edge: true, color: '#f687b3' },
-            { id: 'edge_bottom', label: null, side: 'bottom', size: 20, edge: true, color: '#f6e05e', shape: SlotShape.DIAMOND }
-        ]
-    });
-
-    // Custom Node: Inline styles and Variable Sizes
+    // Custom Node
     const node8 = graph.addNode({
         id: 'node-custom',
-        position: { x: 400, y: 500 },
+        position: { x: 450, y: 600 },
         resizable: true,
         header: {
             content: '<strong>Custom Sizes</strong>',
@@ -160,14 +155,16 @@ document.addEventListener('DOMContentLoaded', () => {
     graph.connect(node2.getOutput('out1'), node4.getInput('in1'));
 
     // Connect complex nodes
-    graph.connectSymbolic(node2, node5, { color: '#aaa' });
+    // Symbolic Connection Example
+    graph.connectSymbolic(node2, node5, { color: '#aaa', dashed: true });
+
     graph.connect(node5.getOutput('out_bottom'), node4.getInput('in1'));
-    graph.connect(node7.getOutput('edge_out'), node8.getInput('big_in'));
+    graph.connect(node6.getOutput('edge_out'), node8.getInput('big_in'));
 
     // Variable Gap Node
     const node9 = graph.addNode({
         id: 'node-gap',
-        position: { x: 700, y: 500 },
+        position: { x: 850, y: 500 },
         header: { content: '<strong>Custom Gap</strong>' },
         slotsTop: { style: { height: '30px', background: 'rgba(255,255,255,0.05)' } }, // Custom top height
         body: { content: '<p>Top slots area height: 30px</p>' },
@@ -181,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Resizable Node
     const node10 = graph.addNode({
         id: 'node-resize',
-        position: { x: 950, y: 50 },
+        position: { x: 1200, y: 50 },
         resizable: true,
         header: { content: '<strong>Resizable</strong>' },
         body: { content: '<p>Drag bottom-right corner to resize</p>', style: { padding: '20px' } },
@@ -196,6 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event listeners for demo
     graph.on('node:select', (node) => {
         console.log('Node selected:', node.id);
+        if (node.data) console.log('Node Data:', node.data);
     });
 
     // Validation Example: Strict Shape Matching
@@ -225,8 +223,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-add-node').addEventListener('click', () => {
         const viewportState = graph.viewport.getState();
         const containerRect = graph.container.getBoundingClientRect();
-
-        // Calculate center of viewport
         const x = (containerRect.width / 2 - viewportState.panX) / viewportState.scale;
         const y = (containerRect.height / 2 - viewportState.panY) / viewportState.scale;
 
@@ -235,15 +231,9 @@ document.addEventListener('DOMContentLoaded', () => {
             position: { x, y },
             header: { content: `<strong>New Node ${nodeCounter - 1}</strong>` },
             body: { content: '<p>Dynamic content here</p>' },
-            inputs: [
-                { id: 'in1', label: 'Input', shape: SlotShape.CIRCLE }
-            ],
-            outputs: [
-                { id: 'out1', label: 'Output', shape: SlotShape.CIRCLE }
-            ]
+            inputs: [{ id: 'in1', label: 'Input', shape: SlotShape.CIRCLE }],
+            outputs: [{ id: 'out1', label: 'Output', shape: SlotShape.CIRCLE }]
         });
-
-        // Select the new node
         graph.selection.selectNode(newNode);
     });
 
@@ -254,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Add custom context menu item
+    // Custom Context Menu: Add Node
     graph.contextMenu.addItem('canvas', {
         id: 'add-node-here',
         label: 'Add Node Here',
@@ -272,15 +262,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Custom Context Menu: Remove Symbolic connections
+    graph.contextMenu.addItem('node', {
+        id: 'disconnect-symbolic',
+        label: 'Clear Symbolic Links',
+        icon: '🔗',
+        action: (context) => {
+            // Demo: find any symbolic connection from this node and remove it
+            const node = context.node;
+            console.log("Removing symbolic links for", node.id);
+            // This is a naive demo impl, a real one would ask "linked to which node?"
+            // But we can iterate connections and remove symbolic ones involving this node
+            const toRemove = [];
+            graph.connections.forEach(conn => {
+                if (conn.style.dashed && (conn.outputSlot === node || conn.inputSlot === node)) {
+                    toRemove.push(conn.id);
+                }
+            });
+            toRemove.forEach(id => graph.disconnect(id));
+        }
+    });
+
     // Add a group
     const group = graph.addGroup({
         label: 'Processing Group',
-        position: { x: 380, y: 70 },
-        size: { width: 180, height: 280 },
+        position: { x: 420, y: 70 },
+        size: { width: 220, height: 350 },
         color: 'rgba(102, 126, 234, 0.1)'
     });
     group.addNode(node2);
     group.addNode(node3);
+    // group.addNode(node8); 
 
     // Keyboard shortcuts info
     console.log(`

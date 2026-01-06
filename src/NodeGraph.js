@@ -44,6 +44,7 @@ export class NodeGraph extends EventEmitter {
                 ...options.zoom
             },
             snapToGrid: options.snapToGrid !== false,
+            bidirectional: options.bidirectional !== false,
             ...options
         };
 
@@ -258,6 +259,11 @@ export class NodeGraph extends EventEmitter {
          * Start dragging a connection from a slot
          */
     _startConnectionDrag(slot, event) {
+        // Enforce bidirectional rule
+        if (!this.options.bidirectional && slot.type === 'input') {
+            return;
+        }
+
         this._connectionDrag = {
             sourceSlot: slot,
             startPos: slot.getConnectionPoint()
