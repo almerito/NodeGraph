@@ -146,6 +146,46 @@ export class ContextMenuManager {
         this.addItem('node', { type: 'separator' });
 
         this.addItem('node', {
+            id: 'disconnect',
+            label: 'Disconnect',
+            icon: '🔌', // Plugin/Disconnect icon
+            action: (context) => {
+                const node = context.node;
+                const connectionsToRemove = [];
+
+                // Collect input connections
+                node.inputSlots.forEach(slot => {
+                    slot.connections.forEach(conn => connectionsToRemove.push(conn.id));
+                });
+
+                // Collect output connections
+                node.outputSlots.forEach(slot => {
+                    slot.connections.forEach(conn => connectionsToRemove.push(conn.id));
+                });
+
+                // Collect symbolic/other connections tracked on node
+                if (node.connections) {
+                    node.connections.forEach(conn => connectionsToRemove.push(conn.id));
+                }
+
+                // Disconnect all
+                connectionsToRemove.forEach(id => this.graph.disconnect(id));
+            },
+            enabled: (context) => {
+                // Only enable if there are connections
+                let hasConnections = false;
+                context.node.inputSlots.forEach(s => { if (s.connections.size > 0) hasConnections = true; });
+                if (hasConnections) return true;
+                context.node.outputSlots.forEach(s => { if (s.connections.size > 0) hasConnections = true; });
+                if (hasConnections) return true;
+                if (context.node.connections && context.node.connections.size > 0) return true;
+                return false;
+            }
+        });
+
+        this.addItem('node', { type: 'separator' });
+
+        this.addItem('node', {
             id: 'delete',
             label: 'Delete',
             icon: '🗑️',

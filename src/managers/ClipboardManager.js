@@ -69,7 +69,13 @@ export class ClipboardManager {
         const connections = [];
 
         this.graph.connections.forEach(conn => {
-            if (nodeIds.has(conn.outputSlot.node.id) && nodeIds.has(conn.inputSlot.node.id)) {
+            // Helper to safely get node ID from a slot or node (symbolic)
+            const getNodeId = (item) => item.node ? item.node.id : item.id;
+
+            const outputNodeId = getNodeId(conn.outputSlot);
+            const inputNodeId = getNodeId(conn.inputSlot);
+
+            if (nodeIds.has(outputNodeId) && nodeIds.has(inputNodeId)) {
                 connections.push(conn.serialize());
             }
         });
@@ -126,15 +132,33 @@ export class ClipboardManager {
         this._clipboardData.nodes.forEach(nodeData => {
             const oldId = nodeData.id;
 
-            // Create new node with new ID
-            const newNode = this.graph.addNode({
-                ...nodeData,
-                id: undefined, // Let it generate new ID
-                position: {
-                    x: pasteX + nodeData.position.x,
-                    y: pasteY + nodeData.position.y
-                }
-            });
+            // Clone data to avoid mutating clipboard source
+            const processedData = JSON.parse(JSON.stringify(nodeData));
+
+            // Set new position
+            processedData.position = {
+                x: pasteX + nodeData.position.x,
+                y: pasteY + nodeData.position.y
+            };
+
+            // Clear ID to allow auto-generation
+            delete processedData.id;
+
+            // Emit interception event
+            // User can modify 'processedData' properties (like header, body) or cancel
+            const eventData = {
+                data: processedData,
+                originalId: oldId,
+                cancel: false
+            };
+
+            this.graph.emit('clipboard:pasting', eventData);
+
+            // Check if user cancelled this specific node paste
+            if (eventData.cancel) return;
+
+            // Create new node using the (potentially modified) data
+            const newNode = this.graph.addNode(processedData);
 
             idMap.set(oldId, newNode.id);
             newNodes.push(newNode);

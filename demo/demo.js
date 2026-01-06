@@ -18,6 +18,14 @@ document.addEventListener('DOMContentLoaded', () => {
         snapToGrid: true
     });
 
+    graph.on('change', (event) => {
+        // event.type: 'node:add', 'node:move', 'node:resize', 'connection:create', etc.
+        // event.item: L'oggetto coinvolto (Node, Connection, Group) o il suo ID
+        // event.timestamp: Timestamp della modifica
+
+        console.log('Modifica:', event.type, event.item);
+    });
+
     // Create sample nodes
     const node1 = graph.addNode({
         id: 'node-1',

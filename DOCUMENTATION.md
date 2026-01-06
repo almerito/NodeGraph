@@ -129,6 +129,7 @@ Triggered for *any* state change in the graph. Useful for auto-saving, history m
 ### Clipboard Events
 - **`clipboard:copy`**: `{ nodes: Node[] }`
 - **`clipboard:cut`**: `{}`
+- **`clipboard:pasting`**: `{ data: NodeConfig, originalId: string, cancel: boolean }` - Fired BEFORE paste. Modify `data` to change node props, or set `cancel = true` to skip.
 - **`clipboard:paste`**: `{ nodes: Node[] }` (New nodes)
 
 ### Canvas Events
