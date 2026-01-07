@@ -1,6 +1,6 @@
 {
   "name": "nodegraph-js",
-  "version": "1.0.9",
+  "version": "1.0.11",
   "description": "A customizable node graph library for JavaScript",
   "type": "module",
   "main": "dist/nodegraph.js",
@@ -28,6 +28,14 @@
     "nodes",
     "connections"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/almerito/NodeGraph.git"
+  },
+  "bugs": {
+    "url": "https://github.com/almerito/NodeGraph/issues"
+  },
+  "homepage": "https://github.com/almerito/NodeGraph#readme",
   "author": "",
   "license": "AGPL-3.0-only",
   "devDependencies": {

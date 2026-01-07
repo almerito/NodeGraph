@@ -14,7 +14,9 @@ const graph = new NodeGraph(container, {
     gridColor: '#2d2d44',
     backgroundColor: '#1a1a2e',
     bidirectional: true, // Allow connections from Input -> Output
-    enforceSlotGroups: false // If true, only slots with matching 'group' can connect
+    enforceSlotGroups: false, // If true, only slots with matching 'group' can connect
+    enforceDirection: true, // If true, enforces Input -> Output direction. False allows In->In / Out->Out.
+    maxConnectDistance: 5 // Max distance (in grid units) for context menu 'Connect' auto-detection (default: 5)
 });
 ```
 
@@ -87,6 +89,7 @@ The library uses CSS variables for slots, which can be overridden globally, per-
   - **Spacebar + Left Mouse Drag** (Temporarily disables box selection)
 - **Zoom**: Mouse Wheel.
 - **Connections**: Drag from an output slot to an input slot.
+- **Smart Snapping**: Drag a connection over a Node body to automatically snap to the first compatible slot (respecting direction and group rules).
 - **Symbolic Connections**: `graph.connectSymbolic(nodeA, nodeB, options)` for dashed logic links.
 
 ## 5. CSS Classes

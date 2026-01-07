@@ -437,6 +437,14 @@
   opacity: 0.7;
 }
 
+.ng-connection-hit-area {
+  cursor: pointer;
+  pointer-events: stroke;
+  fill: none;
+  stroke: transparent;
+  /* Fallback if not set in JS */
+}
+
 /* ============================================
    Groups
    ============================================ */

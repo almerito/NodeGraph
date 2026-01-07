@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.11] - 2026-01-07
+### Added
+- **Configurable Smart Connect**: Added `maxConnectDistance` option (default: 5) to control the reach of the context menu "Connect" feature. Distance is measured in grid units between node edges.
+
+## [1.0.10] - 2026-01-06
+### Added
+- **Smart Node Snapping**: Dragging a connection over a Node's body now automatically snaps to the first compatible slot (respecting `enforceDirection` and `enforceSlotGroups` rules).
+- **Better connection selection**: Now it's easier to select a connection by clicking on it (the active area is wider).
+
 ## [1.0.9] - 2026-01-06
 ### Added
 - **Slot Grouping**: Added `group` property to Slot configuration to define logical pairs (e.g., 'horizontal' vs 'vertical').

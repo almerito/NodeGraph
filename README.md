@@ -1,25 +1,36 @@
 # NodeGraph.js
 
+[![npm version](https://badge.fury.io/js/nodegraph-js.svg)](https://badge.fury.io/js/nodegraph-js)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+
+**[GitHub Repository](https://github.com/almerito/NodeGraph)**
+
 A lightweight, high-performance, vanilla JavaScript library for creating node-based graph editors. Built with zero dependencies (runtime) and designed for flexibility and ease of use.
 
 ## Features
 
-- **Core Graph**: Infinite canvas with pan and zoom capabilities.
-- **Nodes & Slots**: Fully customizable nodes with input/output slots. Supports various slot shapes (circle, square, arrow, diamond).
-- **Connections**: Smooth Bezier curves for connections. Supports "symbolic" (dashed) connections for visual references.
-- **Interactivity**: 
-  - Drag and drop connections.
-  - Multi-selection (box selection, additive).
-  - Context menus for nodes, canvas, groups, and connections.
-  - Smart proximity auto-connect.
+- **Infinite Canvas**: smooth pan and zoom using CSS transforms.
+- **Flexible Nodes**: 
+    - Full customization of Header, Body, and Footer.
+    - Resizable nodes.
+    - Persistent data storage.
+- **Advanced Slots**: 
+    - Inputs/Outputs can be placed on any side (Top, Bottom, Left, Right).
+    - Customizable shapes (Circle, Square, Diamond, Arrow).
+    - **Grouping**: Define logical pairs (e.g. Horizontal In/Out).
+- **Smart Connections**: 
+    - Bezier curves with automatic path calculation.
+    - **Smart Snapping**: Drop connections on nodes to auto-snap to compatible slots.
+    - **Validation**: Enforce direction (In->Out) or groups, or allow flexible connections.
+    - **Symbolic Connections**: Dashed lines for logical relationships without data flow.
+- **Interaction**:
+    - Multi-selection (Box select, Ctrl+Click).
+    - Context Menus (fully customizable).
+    - Clipboard (Copy/Paste nodes and sub-graphs).
+    - Undo/Redo support (via API hooks).
 - **Organization**:
-  - Group nodes into colored containers.
-  - Auto-arrange feature (Island Packing algorithm) to organize messy graphs.
-- **Developer Experience**:
-  - Event-driven architecture (`on('node:select')`, `on('connection:create')`, etc.).
-  - Serialization/Deserialization support (JSON).
-  - Connection validation hooks.
-  - customizable CSS theming.
+    - **Groups**: visual containers to organize nodes.
+    - **Auto-Arrange**: built-in algorithm to untangle messy graphs.
 
 ## Installation
 
@@ -27,45 +38,45 @@ A lightweight, high-performance, vanilla JavaScript library for creating node-ba
 npm install nodegraph-js
 ```
 
-## Development
-
-Currently set up as a Vite project.
-
-```bash
-# Run development server
-npm run dev
-
-# Build for production
-npm run build
-```
-
 ## Basic Usage
 
 ```javascript
-import { NodeGraph, SlotShape } from 'nodegraph-js';
+import { NodeGraph } from 'nodegraph-js';
 import 'nodegraph-js/style.css';
 
-// Initialize the graph
+// Initialize
 const graph = new NodeGraph('#graph-container', {
-    grid: { enabled: true, step: 20 },
-    zoom: { min: 0.1, max: 2 }
+    gridSize: 20,
+    gridColor: '#2d2d44',
+    backgroundColor: '#1a1a2e',
+    bidirectional: true,      // Allow dragging from Input to Output
+    enforceDirection: true,   // Block Input-Input connections
+    enforceSlotGroups: false  // Strict group matching
 });
 
-// Add a node
+// Add a Node
 const node1 = graph.addNode({
     id: 'node-1',
     position: { x: 100, y: 100 },
     header: { content: 'My Node' },
-    inputs: [{ id: 'in', label: 'Input', shape: SlotShape.CIRCLE }],
-    outputs: [{ id: 'out', label: 'Output', shape: SlotShape.CIRCLE }]
+    inputs: [
+        { id: 'in', label: 'Input', shape: 'circle', group: 'main' }
+    ],
+    outputs: [
+        { id: 'out', label: 'Output', shape: 'circle', group: 'main' }
+    ]
 });
 
 // Listen for events
-graph.on('connection:create', (connection) => {
-    console.log('Connected:', connection);
+graph.on('connection:create', (conn) => {
+    console.log('New connection:', conn);
 });
 ```
 
+## Documentation
+
+For full documentation on API, Configuration, and Styling, please check the [GitHub Repository](https://github.com/almerito/NodeGraph).
+
 ## License
 
-AGPL-3.0
+AGPL-3.0-only

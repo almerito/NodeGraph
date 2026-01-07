@@ -46,7 +46,9 @@ export class NodeGraph extends EventEmitter {
             snapToGrid: options.snapToGrid !== false,
             bidirectional: options.bidirectional !== false,
             enforceSlotGroups: options.enforceSlotGroups === true,
+            enforceSlotGroups: options.enforceSlotGroups === true,
             enforceDirection: options.enforceDirection !== false,
+            maxConnectDistance: options.maxConnectDistance !== undefined ? options.maxConnectDistance : 5,
             ...options
         };
 
@@ -330,6 +332,45 @@ export class NodeGraph extends EventEmitter {
                     } else {
                         // Fallback check both
                         targetSlot = node.inputSlots.get(slotId) || node.outputSlots.get(slotId);
+                    }
+                }
+            }
+        } else {
+            // Smart Snap: Hovering Node body?
+            const nodeElement = targetElement?.closest('.ng-node');
+            if (nodeElement) {
+                const nodeId = nodeElement.dataset.nodeId;
+                const node = this.nodes.get(nodeId);
+                const sourceSlot = this._connectionDrag.sourceSlot;
+
+                // Only snap if not the source node
+                if (node && node !== sourceSlot.node) {
+                    // Determine possible targets
+                    let candidates = [];
+
+                    if (this.options.enforceDirection) {
+                        // Strict direction: In -> Out, Out -> In
+                        if (sourceSlot.type === 'input') {
+                            candidates = Array.from(node.outputSlots.values());
+                        } else {
+                            candidates = Array.from(node.inputSlots.values());
+                        }
+                    } else {
+                        // Any slot
+                        candidates = [
+                            ...Array.from(node.inputSlots.values()),
+                            ...Array.from(node.outputSlots.values())
+                        ];
+                    }
+
+                    // Filter by Group
+                    if (this.options.enforceSlotGroups) {
+                        candidates = candidates.filter(s => s.group === sourceSlot.group);
+                    }
+
+                    // Pick first available
+                    if (candidates.length > 0) {
+                        targetSlot = candidates[0];
                     }
                 }
             }
@@ -751,7 +792,8 @@ export class NodeGraph extends EventEmitter {
      * @returns {number} Number of connections made
      */
     autoConnect(node) {
-        const threshold = Math.min(node.element.offsetWidth, node.element.offsetHeight) / 2;
+        const gridSize = this.options.grid?.step || 20;
+        const threshold = this.options.maxConnectDistance * gridSize;
         const nodeBounds = node.getBounds();
         let connectionsMade = 0;
 

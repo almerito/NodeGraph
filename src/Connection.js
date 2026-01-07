@@ -33,23 +33,37 @@ export class Connection {
      * Create the SVG path element
      */
     _createPath() {
+        // Visible path
         this.pathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         this.pathElement.classList.add('ng-connection');
         this.pathElement.dataset.connectionId = this.id;
 
+        // Hit Area path (invisible, wider)
+        this.hitPathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        this.hitPathElement.classList.add('ng-connection-hit-area');
+        this.hitPathElement.dataset.connectionId = this.id;
+
         this._applyStyle();
         this.updatePath();
 
+        // Append visible first, then hit area (so hit area is on top)
         this.svgLayer.appendChild(this.pathElement);
+        this.svgLayer.appendChild(this.hitPathElement);
     }
 
     /**
      * Apply style to the path
      */
     _applyStyle() {
+        // Style visible path
         this.pathElement.setAttribute('stroke', this.style.color);
         this.pathElement.setAttribute('stroke-width', this.style.width);
         this.pathElement.setAttribute('fill', 'none');
+
+        // Style hit path
+        this.hitPathElement.setAttribute('stroke', 'transparent');
+        this.hitPathElement.setAttribute('stroke-width', Math.max(20, this.style.width * 5)); // Minimum 20px hit area
+        this.hitPathElement.setAttribute('fill', 'none');
 
         if (this.style.dashed) {
             this.pathElement.setAttribute('stroke-dasharray', '8,4');
@@ -65,10 +79,12 @@ export class Connection {
         // Dashed (symbolic) connections are non-interactive
         if (this.style.dashed) {
             this.pathElement.style.pointerEvents = 'none';
+            this.hitPathElement.style.pointerEvents = 'none';
             return;
         }
 
-        this.pathElement.addEventListener('click', (e) => {
+        // Bind events to the HIT AREA, not the visible path
+        this.hitPathElement.addEventListener('click', (e) => {
             e.stopPropagation();
             // Delegate to selection manager
             if (this.outputSlot.node.graph) {
@@ -76,7 +92,7 @@ export class Connection {
             }
         });
 
-        this.pathElement.addEventListener('contextmenu', (e) => {
+        this.hitPathElement.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             e.stopPropagation();
             // Select if not already selected
@@ -90,11 +106,11 @@ export class Connection {
             }));
         });
 
-        this.pathElement.addEventListener('mouseenter', () => {
+        this.hitPathElement.addEventListener('mouseenter', () => {
             this.pathElement.classList.add('ng-connection--hover');
         });
 
-        this.pathElement.addEventListener('mouseleave', () => {
+        this.hitPathElement.addEventListener('mouseleave', () => {
             this.pathElement.classList.remove('ng-connection--hover');
         });
     }
@@ -112,6 +128,7 @@ export class Connection {
 
         const pathData = calculateBezierPath(startPos, endPos, startOrientation, endOrientation);
         this.pathElement.setAttribute('d', pathData);
+        this.hitPathElement.setAttribute('d', pathData);
     }
 
     /**
@@ -154,6 +171,9 @@ export class Connection {
         // Remove DOM element
         if (this.pathElement && this.pathElement.parentNode) {
             this.pathElement.parentNode.removeChild(this.pathElement);
+        }
+        if (this.hitPathElement && this.hitPathElement.parentNode) {
+            this.hitPathElement.parentNode.removeChild(this.hitPathElement);
         }
     }
 

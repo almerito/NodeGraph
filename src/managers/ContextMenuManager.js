@@ -127,7 +127,8 @@ export class ContextMenuManager {
             enabled: (context) => {
                 // Check if any node is close enough
                 const node = context.node;
-                const threshold = Math.min(node.element.offsetWidth, node.element.offsetHeight) / 2;
+                const gridSize = this.graph.options.grid?.step || 20;
+                const threshold = this.graph.options.maxConnectDistance * gridSize;
                 const nodeBounds = node.getBounds();
 
                 for (const other of this.graph.nodes.values()) {
