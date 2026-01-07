@@ -87,7 +87,7 @@ The library uses CSS variables for slots, which can be overridden globally, per-
 - **Pan**: 
   - Middle Mouse Drag
   - **Spacebar + Left Mouse Drag** (Temporarily disables box selection)
-- **Zoom**: Mouse Wheel.
+- **Zoom**: Mouse Wheel. Canvas Context Menu > "Fit View" to fit all nodes.
 - **Connections**: Drag from an output slot to an input slot.
 - **Smart Snapping**: Drag a connection over a Node body to automatically snap to the first compatible slot (respecting direction and group rules).
 - **Symbolic Connections**: `graph.connectSymbolic(nodeA, nodeB, options)` for dashed logic links.

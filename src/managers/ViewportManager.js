@@ -236,10 +236,57 @@ export class ViewportManager {
      * Set state
      * @param {object} state - {scale, panX, panY}
      */
-    setState(state) {
-        if (state.scale !== undefined) this.scale = state.scale;
-        if (state.panX !== undefined) this.panX = state.panX;
-        if (state.panY !== undefined) this.panY = state.panY;
+    /**
+     * Fit viewport to content (all nodes)
+     * @param {Map} nodes - Map of nodes
+     * @param {number} padding - Padding around content
+     */
+    fitToContent(nodes, padding = 50) {
+        if (!nodes || nodes.size === 0) {
+            this.reset();
+            return;
+        }
+
+        let minX = Infinity;
+        let minY = Infinity;
+        let maxX = -Infinity;
+        let maxY = -Infinity;
+
+        nodes.forEach(node => {
+            const bounds = node.getBounds();
+            // getBounds returns x/y top-left.
+            minX = Math.min(minX, bounds.x);
+            minY = Math.min(minY, bounds.y);
+            maxX = Math.max(maxX, bounds.x + bounds.width);
+            maxY = Math.max(maxY, bounds.y + bounds.height);
+        });
+
+        if (minX === Infinity) return;
+
+        const contentWidth = maxX - minX;
+        const contentHeight = maxY - minY;
+
+        const containerRect = this.container.getBoundingClientRect();
+        const availableWidth = containerRect.width - (padding * 2);
+        const availableHeight = containerRect.height - (padding * 2);
+
+        const scaleX = availableWidth / contentWidth;
+        const scaleY = availableHeight / contentHeight;
+
+        // Use the smaller scale to fit both dimensions, clamped to limits
+        let newScale = Math.min(scaleX, scaleY);
+        newScale = Math.min(Math.max(newScale, this.options.minZoom), this.options.maxZoom);
+
+        // Calculate center of content
+        const contentCenterX = minX + contentWidth / 2;
+        const contentCenterY = minY + contentHeight / 2;
+
+        // Calculate pan to put content center at container center
+        this.scale = newScale;
+        this.panX = (containerRect.width / 2) - (contentCenterX * this.scale);
+        this.panY = (containerRect.height / 2) - (contentCenterY * this.scale);
+
         this._applyTransform();
     }
+
 }

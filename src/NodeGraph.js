@@ -870,6 +870,13 @@ export class NodeGraph extends EventEmitter {
     }
 
     /**
+     * Fit all nodes within the viewport
+     */
+    fitView() {
+        this.viewport.fitToContent(this.nodes);
+    }
+
+    /**
      * Auto-arrange nodes using Island Component Packing (16:9 Aspect Ratio)
      */
     arrange() {

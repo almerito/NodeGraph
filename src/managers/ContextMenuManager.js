@@ -92,6 +92,13 @@ export class ContextMenuManager {
             action: () => this.graph.viewport?.reset()
         });
 
+        this.addItem('canvas', {
+            id: 'fit-view',
+            label: 'Fit View',
+            icon: '🔍',
+            action: () => this.graph.fitView()
+        });
+
         // Node menu items
         this.addItem('node', {
             id: 'copy',
