@@ -549,11 +549,12 @@ export class Node {
      */
     getBounds() {
         const rect = this.element.getBoundingClientRect();
+        const scale = (this.graph && this.graph.viewport) ? this.graph.viewport.scale : 1;
         return {
             x: this.position.x,
             y: this.position.y,
-            width: rect.width,
-            height: rect.height
+            width: rect.width / scale,
+            height: rect.height / scale
         };
     }
 

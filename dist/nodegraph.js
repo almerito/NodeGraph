@@ -452,12 +452,12 @@ class z {
    * @returns {object} {x, y, width, height}
    */
   getBounds() {
-    const t = this.element.getBoundingClientRect();
+    const t = this.element.getBoundingClientRect(), e = this.graph && this.graph.viewport ? this.graph.viewport.scale : 1;
     return {
       x: this.position.x,
       y: this.position.y,
-      width: t.width,
-      height: t.height
+      width: t.width / e,
+      height: t.height / e
     };
   }
   /**
@@ -1998,7 +1998,7 @@ class X extends I {
       if (o === t) return;
       const a = o.getBounds(), r = Math.max(0, Math.abs(i.x + i.width / 2 - (a.x + a.width / 2)) - (i.width + a.width) / 2), p = Math.max(0, Math.abs(i.y + i.height / 2 - (a.y + a.height / 2)) - (i.height + a.height) / 2);
       if (Math.sqrt(r * r + p * p) < s) {
-        let l = null, d = 1 / 0;
+        let l = null, d = s;
         if (t.outputSlots.forEach((m) => {
           o.inputSlots.forEach((u) => {
             const g = this._getSlotDistance(m, u);

@@ -815,7 +815,7 @@ export class NodeGraph extends EventEmitter {
                 // We want the pair of slots with MINIMUM distance
 
                 let bestPair = null;
-                let minDistance = Infinity;
+                let minDistance = threshold;
 
                 // 1. Try Node -> Other (Output -> Input)
                 node.outputSlots.forEach(outSlot => {
