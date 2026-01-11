@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.18] - 2026-01-11
+### Added
+- **Keyboard Shortcuts**: Added `c` to auto-connect selected nodes and `x` to disconnect selected nodes/connections.
+- **NodeGraph**: Added `disconnectNode(node)` helper method.
+
+## [1.0.17] - 2026-01-07
+### Fixed
+- **Clipboard Cancel Crash**: Fixed a crash that occurred when cancelling a node creation (via `node:create`) during a paste or duplicate operation.
+
+## [1.0.16] - 2026-01-07
+### Added
+- **Pre-insertion Event**: Added `node:create` event that triggers before node instantiation, allowing cancellation via `context.cancel = true`.
+
+## [1.0.15] - 2026-01-07
+### Fixed
+- **Viewport Manager**: Fixed another issue where the viewport manager was not properly initialized.
+
+## [1.0.14] - 2026-01-07
+### Fixed
+- **Viewport Manager**: Fixed an issue where the viewport manager was not properly initialized.
+
 ## [1.0.13] - 2026-01-07
 ### Added
 - **Fit View**: Added "Fit View" option to the canvas context menu to automatically fit all nodes within the viewport.

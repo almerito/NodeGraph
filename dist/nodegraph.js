@@ -51,7 +51,7 @@ function P(f, t) {
     e || (f.apply(this, s), e = !0, setTimeout(() => e = !1, t));
   };
 }
-function R(f, t) {
+function X(f, t) {
   let e;
   return function(...s) {
     clearTimeout(e), e = setTimeout(() => f.apply(this, s), t);
@@ -558,7 +558,7 @@ function M(f, t, e = "horizontal", s = "horizontal") {
   const p = Math.min(Math.abs(i) / 2, Math.abs(n) / 2, 100), r = Math.max(p, 50);
   return e === "horizontal" ? (h = f.x + r, o = f.y) : (h = f.x, o = f.y + r), s === "horizontal" ? (a = t.x - r, l = t.y) : (a = t.x, l = t.y - r), `M ${f.x} ${f.y} C ${h} ${o}, ${a} ${l}, ${t.x} ${t.y}`;
 }
-function X(f, t) {
+function R(f, t) {
   return {
     x: (f.x + t.x) / 2,
     y: (f.y + t.y) / 2
@@ -991,6 +991,9 @@ class D {
    * Set state
    * @param {object} state - {scale, panX, panY}
    */
+  setState(t) {
+    t.scale !== void 0 && (this.scale = t.scale), t.panX !== void 0 && (this.panX = t.panX), t.panY !== void 0 && (this.panY = t.panY), this._applyTransform();
+  }
   /**
    * Fit viewport to content (all nodes)
    * @param {Map} nodes - Map of nodes
@@ -1597,7 +1600,7 @@ class G {
       };
       if (this.graph.emit("clipboard:pasting", p), p.cancel) return;
       const c = this.graph.addNode(l);
-      s.set(a, c.id), i.push(c), (r = this.graph.selection) == null || r.addToSelection(c);
+      c && (s.set(a, c.id), i.push(c), (r = this.graph.selection) == null || r.addToSelection(c));
     }), this._clipboardData.connections.forEach((o) => {
       const a = s.get(o.outputNodeId), l = s.get(o.inputNodeId);
       if (a && l) {
@@ -1632,7 +1635,7 @@ class G {
     this._clipboardData = null;
   }
 }
-class k extends I {
+class Y extends I {
   /**
    * @param {string|HTMLElement} container - Container element or selector
    * @param {object} options - Graph options
@@ -1865,14 +1868,17 @@ class k extends I {
   /**
    * Add a node to the graph
    * @param {object} config - Node configuration
-   * @returns {Node} Created node
+   * @returns {Node|null} Created node or null if cancelled
    */
   addNode(t) {
-    const e = new z({
+    const e = { config: t, cancel: !1 };
+    if (this.emit("node:create", e), e.cancel)
+      return null;
+    const s = new z({
       ...t,
       graph: this
     });
-    return this.nodes.set(e.id, e), this.nodesLayer.appendChild(e.element), this.emit("node:add", e), e;
+    return this.nodes.set(s.id, s), this.nodesLayer.appendChild(s.element), this.emit("node:add", s), s;
   }
   /**
    * Remove a node from the graph
@@ -2165,15 +2171,15 @@ export {
   B as GridManager,
   A as Group,
   z as Node,
-  k as NodeGraph,
+  Y as NodeGraph,
   T as SelectionManager,
   L as Slot,
   C as SlotOrientation,
   w as SlotShape,
   D as ViewportManager,
   M as calculateBezierPath,
-  R as debounce,
-  X as getBezierMidpoint,
+  X as debounce,
+  R as getBezierMidpoint,
   P as throttle,
   S as uid
 };

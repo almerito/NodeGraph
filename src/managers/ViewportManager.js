@@ -236,6 +236,13 @@ export class ViewportManager {
      * Set state
      * @param {object} state - {scale, panX, panY}
      */
+    setState(state) {
+        if (state.scale !== undefined) this.scale = state.scale;
+        if (state.panX !== undefined) this.panX = state.panX;
+        if (state.panY !== undefined) this.panY = state.panY;
+        this._applyTransform();
+    }
+
     /**
      * Fit viewport to content (all nodes)
      * @param {Map} nodes - Map of nodes

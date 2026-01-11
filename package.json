@@ -1,6 +1,6 @@
 {
   "name": "nodegraph-js",
-  "version": "1.0.13",
+  "version": "1.0.18",
   "description": "A customizable node graph library for JavaScript",
   "type": "module",
   "main": "dist/nodegraph.js",

@@ -522,9 +522,17 @@ export class NodeGraph extends EventEmitter {
     /**
      * Add a node to the graph
      * @param {object} config - Node configuration
-     * @returns {Node} Created node
+     * @returns {Node|null} Created node or null if cancelled
      */
     addNode(config) {
+        // Pre-creation event allowing cancellation
+        const context = { config, cancel: false };
+        this.emit('node:create', context);
+
+        if (context.cancel) {
+            return null;
+        }
+
         const node = new Node({
             ...config,
             graph: this
@@ -625,6 +633,33 @@ export class NodeGraph extends EventEmitter {
 
         this.emit('connection:create', connection);
         return connection;
+    }
+
+    /**
+     * Disconnect all connections from a node
+     * @param {string|Node} nodeOrId 
+     */
+    disconnectNode(nodeOrId) {
+        const node = typeof nodeOrId === 'string' ? this.nodes.get(nodeOrId) : nodeOrId;
+        if (!node) return;
+
+        // Collect all connection IDs first
+        const connectionIds = new Set();
+
+        node.inputSlots.forEach(slot => {
+            slot.connections.forEach(conn => connectionIds.add(conn.id));
+        });
+
+        node.outputSlots.forEach(slot => {
+            slot.connections.forEach(conn => connectionIds.add(conn.id));
+        });
+
+        // Symbolic and other connections tracked on the node
+        if (node.connections) {
+            node.connections.forEach(conn => connectionIds.add(conn.id));
+        }
+
+        connectionIds.forEach(id => this.disconnect(id));
     }
 
     /**

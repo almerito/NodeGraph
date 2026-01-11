@@ -54,20 +54,40 @@ export class SelectionManager {
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
-            // Delete selected nodes
-            if (e.key === 'Delete' || e.key === 'Backspace') {
-                if (document.activeElement.tagName !== 'INPUT' &&
-                    document.activeElement.tagName !== 'TEXTAREA') {
+            if (document.activeElement.tagName !== 'INPUT' &&
+                document.activeElement.tagName !== 'TEXTAREA' &&
+                !document.activeElement.isContentEditable) {
+
+                // Delete selected nodes
+                if (e.key === 'Delete' || e.key === 'Backspace') {
                     this.deleteSelected();
                 }
-            }
 
-            // Select all
-            if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
-                if (document.activeElement.tagName !== 'INPUT' &&
-                    document.activeElement.tagName !== 'TEXTAREA') {
+                // Select all
+                if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
                     e.preventDefault();
                     this.selectAll();
+                }
+
+                // Shortcuts: c = Connect
+                if (e.key.toLowerCase() === 'c') {
+                    this.selectedNodes.forEach(node => {
+                        this.graph.autoConnect(node);
+                    });
+                }
+
+                // Shortcuts: x = Disconnect
+                if (e.key.toLowerCase() === 'x') {
+                    // Disconnect selected connections
+                    this.selectedConnections.forEach(conn => {
+                        this.graph.disconnect(conn.id);
+                    });
+                    this.clearConnectionSelection();
+
+                    // Disconnect selected nodes
+                    this.selectedNodes.forEach(node => {
+                        this.graph.disconnectNode(node);
+                    });
                 }
             }
 

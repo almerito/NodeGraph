@@ -160,6 +160,8 @@ export class ClipboardManager {
             // Create new node using the (potentially modified) data
             const newNode = this.graph.addNode(processedData);
 
+            if (!newNode) return;
+
             idMap.set(oldId, newNode.id);
             newNodes.push(newNode);
 

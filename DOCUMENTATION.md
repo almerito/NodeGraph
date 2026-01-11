@@ -110,6 +110,7 @@ Triggered for *any* state change in the graph. Useful for auto-saving, history m
   - `item`: Affected object or ID
 
 ### Node Events
+- **`node:create`**: `(context: { config: NodeConfig, cancel: boolean })` - Fired BEFORE node creation. Set `context.cancel = true` to prevent adding the node.
 - **`node:add`**: `(node: Node)` - Fired when a node is added.
 - **`node:remove`**: `(nodeId: string)` - Fired when a node is removed.
 - **`node:select`**: `(node: Node)` - Fired when a node is selected.
@@ -189,3 +190,37 @@ graph.disconnect(connection.id);
 // Remove ALL symbolic connections between two nodes
 graph.disconnectSymbolic(nodeA, nodeB);
 ```
+
+## 9. Keyboard Shortcuts
+
+NodeGraph comes with several built-in keyboard shortcuts to speed up workflow:
+
+| Shortcut | Action | Description |
+|----------|--------|-------------|
+| **Delete / Backspace** | Delete | Removes selected nodes and connections. |
+| **Ctrl + A** | Select All | Selects all nodes in the graph. |
+| **Ctrl + C** | Copy | Copies selected nodes to the clipboard. |
+| **Ctrl + X** | Cut | Cuts selected nodes (copies and deletes them). |
+| **Ctrl + V** | Paste | Pastes nodes from the clipboard. |
+| **Ctrl + D** | Duplicate | Duplicates selected nodes (Copy + Paste). |
+| **C** | Connect | Smartly connects selected nodes to nearby compatible slots (Same as Context Menu > Connect). |
+| **X** | Disconnect | **Nodes:** Disconnects all wires from selected nodes.<br>**Connections:** Deletes selected connections. |
+
+## 10. API Reference
+
+Commonly used methods on the `NodeGraph` instance:
+
+### Node Management
+- **`addNode(config)`**: Adds a new node. Returns the created node instance (or `null` if cancelled).
+- **`removeNode(nodeId)`**: Removes a node by ID.
+- **`getNode(nodeId)`**: Returns a node instance by ID.
+
+### Connection Management
+- **`connect(outputSlot, inputSlot, style?)`**: Creates a connection between two slots.
+- **`connectSymbolic(nodeA, nodeB, style?)`**: Creates a symbolic connection between two nodes.
+- **`disconnect(connectionId)`**: Removes a connection by ID.
+- **`disconnectNode(nodeOrId)`**: Removes ALL connections (regular and symbolic) attached to a specific node.
+- **`disconnectSymbolic(nodeA, nodeB)`**: Removes symbolic connections between two nodes.
+
+### Viewport
+- **`fitView(padding?)`**: Zooms and pans to fit all nodes within the view.
